@@ -1,0 +1,24 @@
+{% include 'solarhacks/base.html' %}
+{% block body %}
+    <h1>Competitors</h1>
+    {% for competitor in competitors %}
+      {% if competitor != request.user.profile %}
+        <div class="competitor">
+          <a href="/profile/{{competitor.id}}"><h3>{{competitor.user.username}}</h3></a>
+          <ul>
+            <li>{{competitor.user.first_name}} {{competitor.user.last_name}}</li>
+            <li>{{competitor.user.email}}</li>
+            <li>{{competitor.school}}</li>
+            {% if competitor.team_id %}
+              <li>Part of a team already</li>
+            {% else %}
+              <li>Not in a team yet</li>
+            {% endif %}
+          </ul>
+          {% if request.user.profile.team_id %}
+            <a href="/invite-to-team?team_id={{request.user.profile.team_id}}&user_id={{competitor.id}}">Invite to team</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endfor %}
+{% endblock %}

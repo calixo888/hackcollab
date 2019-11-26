@@ -1,0 +1,10 @@
+{% include 'solarhacks/base.html' %}
+{% block body %}
+  <h1>Invite to team</h1>
+  <form method="post">
+    {% csrf_token %}
+    <input type="text" name="title" placeholder="Title" value="You've been invited to join a team!">
+    <textarea name="description" rows="8" cols="80" placeholder="Description"></textarea>
+    <input type="submit" value="Invite to team">
+  </form>
+{% endblock %}

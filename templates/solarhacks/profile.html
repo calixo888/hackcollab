@@ -1,0 +1,28 @@
+{% include 'solarhacks/base.html' %}
+{% block body %}
+<h1>{{profile.user.username}}</h1>
+<ul>
+  <li>{{profile.user.first_name}}</li>
+  <li>{{profile.user.last_name}}</li>
+  <li>{{profile.user.email}}</li>
+  <li>{{profile.birthday}}</li>
+  <li>{{profile.school}}</li>
+  <li>{{profile.gender}}</li>
+  <li>{{profile.phone_number}}</li>
+  <li>{{profile.notification_type}}</li>
+  <li>{{profile.areas_of_expertise}}</li>
+  <li>{{profile.past_accomplishments}}</li>
+  <li>{{profile.github_link}}</li>
+  <li>{{profile.linkedin_link}}</li>
+  <li>{{profile.personal_website_link}}</li>
+  <li>{{profile.profile_picture}}</li>
+  <li>{{profile.looking_to_join}}</li>
+  <li>{{profile.communication}}</li>
+  <li>{{profile.public_speaking}}</li>
+  <li>{{profile.teamwork}}</li>
+  <li>{{profile.leadership}}</li>
+  {% if team %}
+    <li>Team: <a href="/team/{{team.id}}">{{team.name}}</a></li>
+  {% endif %}
+</ul>
+{% endblock %}

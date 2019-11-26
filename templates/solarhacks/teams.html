@@ -1,0 +1,18 @@
+{% include 'solarhacks/base.html' %}
+{% block body %}
+    <h1>Teams</h1>
+    {% for team, teammates in teams.items %}
+      <div class="competitor">
+        <a href="/team/{{team.id}}"><h3>{{team.name}}</h3></a>
+        <p>
+          {{team.description}}
+        </p>
+        <ul>
+          {% for teammate in teammates %}
+            <li><a href="/profile/{{teammate.id}}">{{teammate.user.username}}</a></li>
+          {% endfor %}
+        </ul>
+        <a href="/join-team/{{team.id}}">Join this Team</a>
+      </div>
+    {% endfor %}
+{% endblock %}

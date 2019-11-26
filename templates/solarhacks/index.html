@@ -1,0 +1,10 @@
+{% if request.user.is_authenticated %}
+    {% include 'solarhacks/base.html' %}
+    {% block body %}
+      <h1>Welcome, {{ request.user.username }}</h1>
+    {% endblock %}
+{% else %}
+      <h1>Solarhacks</h1>
+      <a href="/register/">Register boi</a>
+      <a href="/login/">Login</a>
+{% endif %}
