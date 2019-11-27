@@ -4,8 +4,12 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.http import JsonResponse
+from django.core.mail import EmailMessage
 from random import randint
 import json
+import datetime
 
 # Function to create random ID for users and teams
 def random_with_N_digits(n):
@@ -30,27 +34,22 @@ def register(request):
         gender = data.get("gender")
         email = data.get("email")
         phone_number = data.get("phone_number")
-        notification_type = data.get("notification_type")
+        # notification_type = data.get("notification_type")
         areas_of_expertise = data.get("areas_of_expertise")
         past_accomplishments = data.get("past_accomplishments")
         github_link = data.get("github_link")
         linkedin_link = data.get("linkedin_link")
         personal_website_link = data.get("personal_website_link")
         profile_picture = data.get("profile_picture")
-        looking_to_join = data.get("looking_to_join")
-
-        # Modifying looking_to_join variable - default returns "on"/"off"
-        if looking_to_join == "on":
-            looking_to_join = True
-        else:
-            looking_to_join = False
-
         username = data.get("username")
         password = data.get("password")
         communication = data.get("communication")
-        public_speaking = data.get("public_speaking")
+        public_speaking = data.get("public-speaking")
         teamwork = data.get("teamwork")
         leadership = data.get("leadership")
+
+        # Modifying birthday to correct date format
+        birthday = datetime.datetime.strptime(birthday, '%m/%d/%Y').strftime('%Y-%m-%d')
 
         # Creating and saving default User
         user = User(first_name=first_name, last_name=last_name, email=email, username=username, password=password)
@@ -58,11 +57,20 @@ def register(request):
         user.save()
 
         # Creating and saving user profile - linked to User
-        profile = models.UserProfile(user=user, id=random_with_N_digits(8), birthday=birthday, school=school, gender=gender, phone_number=phone_number, notification_type=notification_type, areas_of_expertise=areas_of_expertise, past_accomplishments=past_accomplishments, github_link=github_link, linkedin_link=linkedin_link, personal_website_link=personal_website_link, profile_picture=profile_picture, looking_to_join=looking_to_join, communication=communication, public_speaking=public_speaking, teamwork=teamwork, leadership=leadership)
+        profile = models.UserProfile(user=user, id=random_with_N_digits(8), birthday=birthday, school=school, gender=gender, phone_number=phone_number, areas_of_expertise=areas_of_expertise, past_accomplishments=past_accomplishments, github_link=github_link, linkedin_link=linkedin_link, personal_website_link=personal_website_link, profile_picture=profile_picture, communication=communication, public_speaking=public_speaking, teamwork=teamwork, leadership=leadership)
+
+        # Grabbing profile picture
+        if 'profile_picture' in request.FILES: # checking if they provided picture
+            profile.profile_picture = request.FILES['profile_picture']
+
+        else:
+            profile.profile_picture = "default.png"
 
         profile.save()
 
         login(request, user)
+
+        messages.success(request, "Account successfully created.")
 
         return HttpResponseRedirect("/")
 
@@ -84,13 +92,14 @@ def user_login(request):
             else:
                 print("Inactive account")
         else:
-            print("Invalid credentials")
+            messages.success(request, "Invalid credentials. Please try again.")
 
     return render(request, "solarhacks/login.html")
 
 @login_required(login_url="/login/")
 def user_logout(request):
     logout(request)
+    messages.success(request, "Successfully logged out.")
     return HttpResponseRedirect("/")
 
 @login_required(login_url="/login/")
@@ -109,13 +118,15 @@ def create_team(request):
         description = data.get("description")
 
         # Creating team with unique and branded ID
-        team = models.Team(id="team-" + str(random_with_N_digits(8)), name=name, description=description, leader=request.user.profile.id)
+        team = models.Team(id="team-" + str(random_with_N_digits(8)), name=name, description=description)
         team.save()
 
         # Getting currently authenticated user and setting their team_id to team created
         user = models.UserProfile.objects.get(user=request.user)
         user.team_id = team.id
         user.save()
+
+        messages.success(request, "Team successfully created.")
 
         return HttpResponseRedirect("/")
 
@@ -139,7 +150,7 @@ def teams(request):
 
 @login_required(login_url="/login/")
 def notifications(request):
-    notifications = models.Notification.objects.filter(target_id=request.user.profile.id)
+    notifications = models.Notification.objects.filter(target_id=request.user.solarhacks_profile.id)
 
     return render(request, "solarhacks/notifications.html", context={"notifications": notifications})
 
@@ -158,7 +169,7 @@ def view_profile(request, user_id):
 def view_team(request, team_id):
     team = models.Team.objects.get(id=team_id)
 
-    if request.user.profile.team_id == team.id:
+    if request.user.solarhacks_profile.team_id == team.id:
         team = models.Team.objects.get(id=team_id)
 
         # Loading all notifications for the team
@@ -166,9 +177,15 @@ def view_team(request, team_id):
         for notification in models.Notification.objects.filter(target_id=team_id):
             notifications[notification] = models.UserProfile.objects.get(id=notification.source_id)
 
+        # Loading all members
+        teammates = []
+        for user in models.UserProfile.objects.all():
+            if user.team_id == team_id:
+                teammates.append(user)
+
         return render(request, "solarhacks/team.html", context={
             "team": team,
-            "leader": models.UserProfile.objects.get(id=team.leader),
+            "teammates": teammates,
             "notifications": notifications
         })
     else:
@@ -182,11 +199,19 @@ def join_team(request, team_id):
         description = request.POST.get("description")
 
         # Source_id = user_id; target_id = team_id
-        source_id = request.user.profile.id
+        source_id = request.user.solarhacks_profile.id
         target_id = team_id
 
-        notification = models.Notification(id="notification-" + str(random_with_N_digits(8)), title=title, description=description, source_id=source_id, target_id=target_id)
+        notification = models.Notification(id="notification-" + str(random_with_N_digits(8)), title=title, description=description, source_id=source_id, target_id=target_id, type="action")
         notification.save()
+
+        # Sending email to each member of team
+        for profile in models.UserProfile.objects.filter(team_id=team_id):
+            email = profile.user.email
+            EmailMessage("Join Team Request", "Please view your team page for more information", to=[email]).send()
+
+        messages.success(request, "Join Team request successfully sent!")
+
         return HttpResponseRedirect("/")
 
     return render(request, "solarhacks/join_team.html")
@@ -202,6 +227,13 @@ def leave_team(request, team_id):
     if not models.UserProfile.objects.filter(team_id=team_id):
         models.Team.objects.get(id=team_id).delete()
 
+    # Sending email to whole team
+    for temp_profile in models.UserProfile.objects.filter(team_id=team_id):
+        email = temp_profile.user.email
+        EmailMessage(profile.user.username + " has the left the team", "Please view your team page for more information", to=[email]).send()
+
+    messages.success(request, "Team successfully left.")
+
     return HttpResponseRedirect("/")
 
 @login_required(login_url="/login/")
@@ -214,8 +246,18 @@ def invite_to_team(request):
         source_id = request.GET.get("team_id")
         target_id = request.GET.get("user_id")
 
-        notification = models.Notification(id="notification-" + str(random_with_N_digits(8)), title=title, description=description, source_id=source_id, target_id=target_id)
+        notification = models.Notification(id="notification-" + str(random_with_N_digits(8)), title=title, description=description, source_id=source_id, target_id=target_id, type="action")
         notification.save()
+
+        # Sending email to user
+        profile = models.UserProfile.objects.get(id=target_id)
+        email = profile.user.email
+        print(email)
+        email_message = EmailMessage("Team invitation received", "Please view your team page for more information", to=[email])
+        email_message.send()
+
+        messages.success(request, "Team invitation successfully sent!")
+
         return HttpResponseRedirect("/")
 
     return render(request, "solarhacks/invite_to_team.html")
@@ -227,18 +269,26 @@ def accept_user(request):
     user_id = request.GET.get("user_id")
     team_id = request.GET.get("team_id")
 
+    team = models.Team.objects.get(id=team_id)
+
     # Deleting notification
     notification = models.Notification.objects.get(id=notification_id)
     notification.delete()
 
     # Creating notification for user
-    notification = models.Notification(id="notification-" + str(random_with_N_digits(8)), title="Accepted into " + team.name, description="Congrats!", source_id=team_id, target_id=user_id)
+    notification = models.Notification(id="notification-" + str(random_with_N_digits(8)), title="Accepted into " + team.name, description="Congrats!", source_id=team_id, target_id=user_id, type="info")
     notification.save()
+
+    profile = models.UserProfile.objects.get(id=user_id)
+    email = profile.user.email
+    EmailMessage("Join Team Request Accepted!", "Please view your team page for more information", to=[email]).send()
 
     # Adding user to team
     profile = models.UserProfile.objects.get(id=user_id)
     profile.team_id = team_id
     profile.save()
+
+    messages.success(request, "User successfully accepted into team!")
 
     return HttpResponseRedirect("/")
 
@@ -256,8 +306,15 @@ def reject_user(request):
     notification.delete()
 
     # Creating notification for user
-    notification = models.Notification(id="notification-" + str(random_with_N_digits(8)), title="Rejected from " + team.name, description="We're sorry", source_id=team_id, target_id=user_id)
+    notification = models.Notification(id="notification-" + str(random_with_N_digits(8)), title="Rejected from " + team.name, description="We're sorry", source_id=team_id, target_id=user_id, type="info")
     notification.save()
+
+    # Sending email to user
+    profile = models.UserProfile.objects.get(id=user_id)
+    email = profile.user.email
+    EmailMessage("Join Team Request Rejected", "Please view your team page for more information", to=[email]).send()
+
+    messages.success(request, "Team invitations successfully rejected.")
 
     return HttpResponseRedirect("/")
 
@@ -278,8 +335,15 @@ def accept_invite(request):
     notification.delete()
 
     # Creating notification for team
-    notification = models.Notification(id="notification-" + str(random_with_N_digits(8)), title=profile.user.username + " accepted invite!", description="Invitation accepted!", source_id=user_id, target_id=team_id)
+    notification = models.Notification(id="notification-" + str(random_with_N_digits(8)), title=profile.user.username + " accepted invite!", description="Invitation accepted!", source_id=user_id, target_id=team_id, type="info")
     notification.save()
+
+    # Sending email to each member of team
+    for profile in models.UserProfile.objects.filter(team_id=team_id):
+        email = profile.user.email
+        EmailMessage("Team invitiation Accepted!", "Please view your team page for more information", to=[email]).send()
+
+    messages.success(request, "Team invitation successfully accepted!")
 
     return HttpResponseRedirect("/")
 
@@ -297,7 +361,23 @@ def reject_invite(request):
     profile = models.UserProfile.objects.get(id=user_id)
 
     # Creating notification for team
-    notification = models.Notification(id="notification-" + str(random_with_N_digits(8)), title=profile.user.username + " rejected team invitation.", description="Invitation rejected.", source_id=user_id, target_id=team_id)
+    notification = models.Notification(id="notification-" + str(random_with_N_digits(8)), title=profile.user.username + " rejected team invitation.", description="Invitation rejected.", source_id=user_id, target_id=team_id, type="info")
     notification.save()
 
+    # Sending email to each member of team
+    for profile in models.UserProfile.objects.filter(team_id=team_id):
+        email = profile.user.email
+        EmailMessage("Team invitation rejected", "Please view your team page for more information", to=[email]).send()
+
+    messages.success(request, "Team invite successfully rejected.")
+
     return HttpResponseRedirect("/")
+
+
+# POST REQUEST
+def delete_notification(request):
+    notification_id = request.GET.get("id")
+
+    models.Notification.objects.get(id=notification_id).delete()
+
+    return JsonResponse({"value": "hi"})

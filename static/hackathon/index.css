@@ -1,0 +1,18 @@
+.main-header {
+  color: white;
+  font-size: 100px;
+  font-weight: bold;
+}
+
+.cta {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.cta-button {
+  width: 200px;
+  margin: 50px 0;
+}

@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -22,4 +24,6 @@ urlpatterns = [
     url(r'^reject-user', views.reject_user, name="reject_user"),
     url(r'^accept-invite', views.accept_invite, name="accept_invite"),
     url(r'^reject-invite', views.reject_invite, name="reject_invite"),
-]
+    # POST REQUEST
+    url(r'^delete-notification', views.delete_notification, name="delete_notification"),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

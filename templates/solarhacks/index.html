@@ -1,10 +1,17 @@
-{% if request.user.is_authenticated %}
-    {% include 'solarhacks/base.html' %}
-    {% block body %}
-      <h1>Welcome, {{ request.user.username }}</h1>
-    {% endblock %}
-{% else %}
-      <h1>Solarhacks</h1>
-      <a href="/register/">Register boi</a>
-      <a href="/login/">Login</a>
-{% endif %}
+{% load staticfiles %}
+{% include 'solarhacks/base.html' %}
+<title>HackCollab - Home</title>
+<link rel="stylesheet" href="{% static 'hackathon/index.css' %}">
+{% block body %}
+  {% if request.user.is_authenticated %}
+    <div class="cta">
+      <h1 class="main-header">Welcome, {{ request.user.username }}</h1>
+    </div>
+  {% else %}
+    <div class="cta">
+      <h1 class="main-header">Solarhacks</h1>
+      <a class="btn btn-outline-light cta-button btn-lg" href="/login/">Login</a>
+      <a class="btn btn-outline-light cta-button btn-lg" href="/register/">Register</a>
+    </div>
+  {% endif %}
+{% endblock %}

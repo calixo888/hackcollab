@@ -1,0 +1,15 @@
+.team-interface {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+}
+
+.x {
+  position: absolute;
+  right: 30px;
+  top: 45%;
+  transform: translateY(-50%);
+  border: none;
+  background-color: transparent;
+  color: #ccc;
+  font-size: 40px;
+}

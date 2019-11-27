@@ -1,24 +1,24 @@
+{% load staticfiles %}
 {% include 'solarhacks/base.html' %}
+<title>HackCollab - Competitors</title>
+<link rel="stylesheet" href="{% static 'hackathon/competitors.css' %}">
 {% block body %}
-    <h1>Competitors</h1>
-    {% for competitor in competitors %}
-      {% if competitor != request.user.profile %}
-        <div class="competitor">
-          <a href="/profile/{{competitor.id}}"><h3>{{competitor.user.username}}</h3></a>
-          <ul>
-            <li>{{competitor.user.first_name}} {{competitor.user.last_name}}</li>
-            <li>{{competitor.user.email}}</li>
-            <li>{{competitor.school}}</li>
-            {% if competitor.team_id %}
-              <li>Part of a team already</li>
-            {% else %}
-              <li>Not in a team yet</li>
-            {% endif %}
-          </ul>
-          {% if request.user.profile.team_id %}
-            <a href="/invite-to-team?team_id={{request.user.profile.team_id}}&user_id={{competitor.id}}">Invite to team</a>
+    <h1 class="header">Competitors</h1>
+    <div class="container">
+      <div class="competitors">
+        {% for competitor in competitors %}
+          {% if competitor != request.user.solarhacks_profile %}
+            <div class="competitor">
+              <div class="image-cropper">
+                <img class="profile-picture" src="/media/{{competitor.profile_picture}}" alt="">
+              </div>
+              <a href="/profile/{{competitor.id}}"><h4>{{competitor.user.username}}</h4></a>
+              {% if request.user.solarhacks_profile.team_id %}
+                <a class="btn btn-primary" href="/invite-to-team?team_id={{request.user.solarhacks_profile.team_id}}&user_id={{competitor.id}}">Invite to team</a>
+              {% endif %}
+            </div>
           {% endif %}
-        </div>
-      {% endif %}
-    {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
 {% endblock %}

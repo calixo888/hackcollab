@@ -1,0 +1,36 @@
+.login-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 50px;
+  border-radius: 5px;
+  box-shadow: 0 5px 8px rgba(0,0,0,.3);
+  min-width: 30%;
+}
+
+.login-container > h1 {
+  text-align: center;
+}
+
+.login-input {
+  /* display: block;
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid rgb(96, 207, 255);
+  font-size: 15px;
+  padding: 10px 15px;
+  transition: all .2s; */
+  margin-bottom: 30px;
+}
+
+/* .login-input:focus {
+  outline: none;
+  border-bottom: 3px solid rgb(9, 130, 255);
+} */
+
+small {
+  display: block;
+  text-align: center;
+}

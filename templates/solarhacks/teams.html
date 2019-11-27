@@ -1,18 +1,29 @@
+{% load staticfiles %}
 {% include 'solarhacks/base.html' %}
+<title>HackCollab - Teams</title>
+<link rel="stylesheet" href="{% static 'hackathon/teams.css' %}">
 {% block body %}
-    <h1>Teams</h1>
-    {% for team, teammates in teams.items %}
-      <div class="competitor">
-        <a href="/team/{{team.id}}"><h3>{{team.name}}</h3></a>
-        <p>
-          {{team.description}}
-        </p>
-        <ul>
-          {% for teammate in teammates %}
-            <li><a href="/profile/{{teammate.id}}">{{teammate.user.username}}</a></li>
-          {% endfor %}
-        </ul>
-        <a href="/join-team/{{team.id}}">Join this Team</a>
+    <h1 class="header">Teams</h1>
+    <div class="container">
+      <div class="teams">
+        {% for team, teammates in teams.items %}
+          <div class="team">
+            <h2>{{team.name}}</h2>
+            <p>
+              <strong>Description:</strong> {{team.description}}
+            </p>
+            <h4>Team Members</h4>
+            <ul class="team-members-list">
+              {% for teammate in teammates %}
+                <li><a href="/profile/{{teammate.id}}">{{teammate.user.username}}</a></li>
+              {% endfor %}
+            </ul>
+            <div class="btn-group btn-block" role="group" aria-label="Basic example">
+              <a class="btn btn-primary" href="/team/{{team.id}}">View Team</a>
+              <a class="btn btn-primary" href="/join-team/{{team.id}}">Join this Team</a>
+            </div>
+          </div>
+        {% endfor %}
       </div>
-    {% endfor %}
+    </div>
 {% endblock %}
