@@ -12,20 +12,18 @@
     <title>HackCollab</title>
   </head>
   <body>
+    <section class="home">
+      <img class="logo" src="{% static 'img/full-logo-white.png' %}" alt="HackCollab Logo">
+      <div class="center-container text-center">
+        <h1 class="main-header">HackCollab</h1>
+        <h3 class="subheader">
+          Build hackathon teams now.
+        </h3>
+        <button class="w-45 solid-cta-button" type="button" name="button" onclick="document.getElementById('contact-us').scrollIntoView({behavior: 'smooth'});">Contact Us!</button>
+        <button class="w-45 ghost-cta-button" type="button" name="button" onclick="window.location.href = 'http://testhacks.{{request.META.HTTP_HOST}}'">Demo it!</button>
+      </div>
+    </section>
     <div class="background-container">
-      <section class="home">
-        <img class="logo" src="{% static 'img/full-logo-white.png' %}" alt="HackCollab Logo">
-        <div class="center-container text-center">
-          <h1 class="main-header">HackCollab</h1>
-          <h3 class="subheader">
-            Build hackathon teams now.
-          </h3>
-          <button class="w-45 solid-cta-button" type="button" name="button" onclick="document.getElementById('contact-us').scrollIntoView({behavior: 'smooth'});">Contact Us!</button>
-          <button class="w-45 ghost-cta-button" type="button" name="button" onclick="window.location.href = 'http://testhacks.{{request.META.HTTP_HOST}}'">Demo it!</button>
-        </div>
-      </section>
-      <div class="border-container"></div>
-
       <section class="about">
         <h1 class="header">About HackCollab</h1>
         <div class="about-cards">
