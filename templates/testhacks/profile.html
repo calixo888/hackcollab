@@ -1,0 +1,82 @@
+{% load staticfiles %}
+{% include 'testhacks/base.html' %}
+<title>HackCollab - Profile</title>
+<link rel="stylesheet" href="{% static 'hackathon/profile.css' %}">
+{% block body %}
+  <h1 class="header">{{profile.user.username}}'s Profile</h1>
+  <div class="profile-container">
+    <div class="image-cropper">
+      <img class="profile-picture" src="/media/{{profile.profile_picture}}" alt="">
+    </div>
+    <p>
+      <strong>Username:</strong> {{profile.user.username}}
+    </p>
+    <p>
+      <strong>First Name:</strong> {{profile.user.first_name}}
+    </p>
+    <p>
+      <strong>Last Name:</strong> {{profile.user.last_name}}
+    </p>
+    <p>
+      <strong>Email:</strong> {{profile.user.email}}
+    </p>
+    <p>
+      <strong>Birthday:</strong> {{profile.birthday}}
+    </p>
+    <p>
+      <strong>School:</strong> {{profile.school}}
+    </p>
+    <p>
+      <strong>Gender:</strong> {{profile.gender}}
+    </p>
+    {% if profile.phone_number %}
+      <p>
+        <strong>Phone Number</strong> {{profile.phone_number}}
+      </p>
+    {% endif %}
+    <p>
+      <strong>Areas of Expertise:</strong> {{profile.areas_of_expertise}}
+    </p>
+    <p>
+      <strong>Past Accomplishments:</strong> {{profile.past_accomplishments}}
+    </p>
+
+    {% if profile.github_link %}
+      <p>
+        <strong>GitHub Link:</strong> <a href="{{profile.github_link}}">{{profile.github_link}}</a>
+      </p>
+    {% endif %}
+
+    {% if profile.linkedin_link %}
+      <p>
+        <strong>LinkedIn Link:</strong> <a href="{{profile.github_link}}">{{profile.linkedin_link}}</a>
+      </p>
+    {% endif %}
+
+    {% if profile.personal_website_link %}
+      <p>
+        <strong>Personal Website Link:</strong> <a href="{{profile.github_link}}">{{profile.personal_website_link}}</a>
+      </p>
+    {% endif %}
+    <h3 class="mb-3">Soft Skill Ratings - Scale from 1-10</h3>
+    <p>
+      <strong>Communication:</strong> {{profile.communication}}
+    </p>
+    <p>
+      <strong>Public Speaking:</strong> {{profile.public_speaking}}
+    </p>
+    <p>
+      <strong>Teamwork:</strong> {{profile.teamwork}}
+    </p>
+    <p>
+      <strong>Leadership:</strong> {{profile.leadership}}
+    </p>
+
+    {% if team %}
+      <p>
+        <strong>Team:</strong> <a href="/team/{{team.id}}">{{team.name}}</a>
+      </p>
+    {% endif %}
+    <a class="btn btn-primary" href="/update/">Update Profile</a>
+  </div>
+{% endblock %}

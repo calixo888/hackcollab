@@ -1,0 +1,59 @@
+{% load staticfiles %}
+{% include 'testhacks/base.html' %}
+<title>HackCollab - My Team</title>
+<link rel="stylesheet" href="{% static 'hackathon/team.css' %}">
+{% block body %}
+    <div class="float-container">
+      <h1>My Team</h1>
+      <div class="team-interface">
+        <div class="left">
+          <h3 class="text-center">Team Info</h3>
+          <p>
+            <strong>Team Name:</strong> {{team.name}}
+          </p>
+          <p>
+            <strong>Team Description:</strong> {{team.description}}
+          </p>
+
+          <strong>Team Members</strong>
+          <ul class="mx-5">
+            {% for teammate in teammates %}
+              <li><a href="/profile/{{teammate.id}}">{{teammate.user.username}}</a></li>
+            {% endfor %}
+          </ul>
+          <a class="btn btn-danger" href="/leave-team/{{team.id}}">Leave Team</a>
+        </div>
+
+        <div class="right">
+          <h3 class="text-center">Team Notifications</h3>
+          {% if notifications %}
+            <div class="list-group">
+              {% for notification, profile in notifications.items %}
+                <div class="list-group-item">
+                  <h5>{{notification.title}}</h5>
+                  <p>{{notification.description}}</p>
+                  {% if notification.type == "action" %}
+                    <div class="btn-group">
+                      <a class="btn btn-primary" href="/accept-user?notification_id={{notification.id}}&user_id={{profile.id}}&team_id={{team.id}}">Accept</a>
+                      <a class="btn btn-primary" href="/reject-user?notification_id={{notification.id}}&team_id={{notification.target_id}}&user_id={{profile.id}}">Reject</a>
+                    </div>
+                    {% else %}
+                      <button class="x" type="button" onclick="deleteNotification('{{notification.id}}')">&times;</button>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <small class="d-block text-center">No notifications!</small>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <script>
+      async function deleteNotification(id) {
+        let response = fetch("/delete-notification?id=" + id)
+        location.reload()
+      }
+    </script>
+{% endblock %}

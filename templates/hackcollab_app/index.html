@@ -1,10 +1,205 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="feature-icon" href="{% static 'img/cut-logo.png' %}"/>
+    <link rel="stylesheet" href="{% static 'hackcollab_app/index.css' %}">
+    <link href="https://fonts.googleapis.com/css?family=Sulphur+Point&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css" rel="stylesheet">
     <title>HackCollab</title>
   </head>
   <body>
-    <h1>HackCollab</h1>
+    <div class="background-container">
+      <section class="home">
+        <img class="logo" src="{% static 'img/full-logo-white.png' %}" alt="HackCollab Logo">
+        <div class="center-container text-center">
+          <h1 class="main-header">HackCollab</h1>
+          <h3 class="subheader">
+            Build hackathon teams now.
+          </h3>
+          <button class="w-45 solid-cta-button" type="button" name="button" onclick="document.getElementById('contact-us').scrollIntoView({behavior: 'smooth'});">Contact Us!</button>
+          <button class="w-45 ghost-cta-button" type="button" name="button" onclick="window.location.href = 'http://testhacks.{{request.META.HTTP_HOST}}'">Demo it!</button>
+        </div>
+      </section>
+      <div class="border-container"></div>
+
+      <section class="about">
+        <h1 class="header">About HackCollab</h1>
+        <div class="about-cards">
+          <div class="about-card">
+            <h1 class="subheader">What is it?</h1>
+            <ul class="card-details fa-ul">
+              <li class="card-detail">
+                <span class="fa-li"><i class="fas fa-angle-right"></i></span>
+                A hackathon team building platform
+              </li>
+              <li class="card-detail">
+                <span class="fa-li"><i class="fas fa-angle-right"></i></span>
+                Used to connect competitors into teams
+              </li>
+              <li class="card-detail">
+                <span class="fa-li"><i class="fas fa-angle-right"></i></span>
+                All done before the event even starts!
+              </li>
+            </ul>
+          </div>
+          <div class="about-card">
+            <h1 class="subheader">Why use it?</h1>
+            <ul class="card-details fa-ul">
+              <li class="card-detail">
+                <span class="fa-li"><i class="fas fa-angle-right"></i></span>
+                A more efficient and organized way to form teams
+              </li>
+              <li class="card-detail">
+                <span class="fa-li"><i class="fas fa-angle-right"></i></span>
+                Allows teams to compete better
+              </li>
+              <li class="card-detail">
+                <span class="fa-li"><i class="fas fa-angle-right"></i></span>
+                Gets rid of awkward team-building exercises
+              </li>
+            </ul>
+          </div>
+          <div class="about-card">
+            <h1 class="subheader">How do I use it?</h1>
+            <ul class="card-details fa-ul">
+              <li class="card-detail">
+                <span class="fa-li"><i class="fas fa-angle-right"></i></span>
+                Our main purpose is to sponsor hackathons
+              </li>
+              <li class="card-detail">
+                <span class="fa-li"><i class="fas fa-angle-right"></i></span>
+                Hackathon organizers must contact us for us to sponsor their event
+              </li>
+              <li class="card-detail">
+                <span class="fa-li"><i class="fas fa-angle-right"></i></span>
+                For more details, please contact us
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+      <div class="border-container"></div>
+
+      <section class="features">
+        <h1 class="header">HackCollab Features</h1>
+        <div class="features-container">
+          <div class="feature">
+            <img class="feature-icon" src="{% static 'img/team.png' %}">
+            <h3 class="feature-header">
+              Team Building
+            </h3>
+            <p class="feature-description">
+              Our platform allows hackathon competitors to create accounts with their information and expertise on display for other competitors to see. If you have an idea or want to lead a team, you can create a team and recruit the teammates you want based on their strengths. If not, you can ask to join an already existing team.
+            </p>
+          </div>
+          <div class="feature">
+            <img src="{% static 'img/network.png' %}" alt="" class="feature-icon">
+            <h3 class="feature-header">
+              Know the Competition
+            </h3>
+            <p class="feature-description">
+              Everyone competing will list their areas of expertise and their past accomplishments. This gives everyone on the platform an idea of who is good at what, opening up the idea of recruiting them or connecting with them.
+            </p>
+          </div>
+          <div class="feature">
+            <img src="{% static 'img/competition.png' %}" alt="" class="feature-icon">
+            <h3 class="feature-header">
+              Compete Better
+            </h3>
+            <p class="feature-description">
+              Instead of carrying on with awkward and unproductive team-building exercises for competitors not yet part of a team, HackCollab allows competitors to form their own teams. This ensures each member will have a role to play in a team that they're comfortable with. This helps those with social anxiety issues find a place in the hackathon.
+            </p>
+          </div>
+        </div>
+      </section>
+      <div class="border-container"></div>
+
+      <section class="faq">
+        <h1 class="header">HackCollab FAQs</h1>
+        <div class="qa-container">
+          <div class="qa">
+            <div class="qa-subsection question">
+              What is the purpose of HackCollab?
+            </div>
+            <div class="qa-subsection answer">
+              The purpose of HackCollab to help hackathons and hackathon organizers through sponsorship. We want to use our software to help make hackathons more competitive and help competitors create lasting connections with each other through the spirit of team building and competition.
+            </div>
+          </div>
+          <div class="qa">
+            <div class="qa-subsection question">
+              How can HackCollab benefit me?
+            </div>
+            <div class="qa-subsection answer">
+              HackCollab allows the use of our software through sponsorships. We will configure our website to accomodate your hackathon and send you the link for you to broadcast to all competitors of the hackathon. We recommend doing that at least a week before the hackathon takes place, giving the competitors enough time to form their teams.
+            </div>
+          </div>
+          <div class="qa">
+            <div class="qa-subsection question">
+              How do I get a sponsorship from HackCollab?
+            </div>
+            <div class="qa-subsection answer">
+              To get sponsored, please contact us! We guarantee a response within 24 hours of your email being sent, and we will answer any questions you may have. Once a sponsorship is agreed upon, we will help you get started with our website and open the registration to the hackathon's competitors.
+            </div>
+          </div>
+        </div>
+      </section>
+      <div class="border-container"></div>
+
+      <section class="contact-us" id="contact-us">
+        <h1 class="header">Contact Us</h1>
+        <p class="contact-us-description text-center">
+          We guarantee a response within 24 hours!
+        </p>
+        <form class="contact-us-form" method="post">
+          <label for="#name">Name:</label>
+          <input class="form-input" id="name" type="text" name="name" placeholder="Name">
+
+          <label for="#email">Email Address:</label>
+          <input class="form-input" id="email" type="email" name="email" placeholder="Email">
+
+          <label for="#message">Message:</label>
+          <textarea class="form-input" id="message" name="message" rows="6" placeholder="Message"></textarea>
+
+          <input class="ghost-cta-button" type="submit" value="Contact Us">
+        </form>
+      </section>
+    </div>
+
+    <footer class="footer">
+      <img src="{% static 'img/full-logo-white.png' %}" alt="HackCollab Logo" class="footer-logo logo">
+      <div class="footer-grid">
+        <div class="text-center contact-info">
+          <h1 class="subheader footer-subheader">Contact Information</h1>
+          <div class="contact">
+            <h3 class="contact-header">Calix Huang</h3>
+            <p class="contact-email">
+              calix.huang1@gmail.com
+            </p>
+            <p class="contact-phone-number">
+              (925)-332-6127
+            </p>
+          </div>
+        </div>
+        <div class="text-center more-info">
+          <h1 class="subheader footer-subheader">More Information</h1>
+          <ul class="more-info-list">
+            <li>
+              <a href="/terms-of-service/">Terms of Service</a>
+            </li>
+            <li>
+              <a href="/privacy-policy/">Privacy Policy</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <small class="copyright">
+        &copy; Calix Huang. All rights reserved.
+      </small>
+    </footer>
   </body>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </html>

@@ -39,9 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'channels',
     'hackcollab_app',
-    'solarhacks',
+    'testhacks',
 ]
 
 MIDDLEWARE = [
@@ -77,16 +76,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'hackcollab_project.wsgi.application'
-ASGI_APPLICATION = 'hackcollab_project.routing.application'
-
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('localhost', 6379)],
-        },
-    },
-}
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -150,7 +139,7 @@ STATICFILES_DIRS = [
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'calix.huang1@gmail.com'
-EMAIL_HOST_PASSWORD = 'Deedeerocks8'
+EMAIL_HOST_USER = 'hackcollab@gmail.com'
+EMAIL_HOST_PASSWORD = 'iloveCalix8'
 EMAIL_PORT = 587
-DEFAULT_FROM_EMAIL = "Calix Huang <calix.huang1@gmail.com>"
+DEFAULT_FROM_EMAIL = "HackCollab Team <hackcollab@gmail.com>"

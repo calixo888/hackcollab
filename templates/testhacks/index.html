@@ -1,0 +1,17 @@
+{% load staticfiles %}
+{% include 'testhacks/base.html' %}
+<title>HackCollab - Home</title>
+<link rel="stylesheet" href="{% static 'hackathon/index.css' %}">
+{% block body %}
+  {% if request.user.is_authenticated %}
+    <div class="cta">
+      <h1 class="main-header">Welcome, {{ request.user.username }}</h1>
+    </div>
+  {% else %}
+    <div class="cta">
+      <h1 class="main-header">TestHacks</h1>
+      <a class="btn btn-outline-light cta-button btn-lg" href="/login/">Login</a>
+      <a class="btn btn-outline-light cta-button btn-lg" href="/register/">Register</a>
+    </div>
+  {% endif %}
+{% endblock %}

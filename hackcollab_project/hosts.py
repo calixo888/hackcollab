@@ -3,5 +3,5 @@ from django_hosts import patterns, host
 
 host_patterns = patterns('',
     host(r'www', 'hackcollab_app.urls', name='www'),
-    host(r'solarhacks', 'solarhacks.urls', name='solarhacks'),
+    host(r'testhacks', 'testhacks.urls', name='testhacks'),
 )

@@ -1,0 +1,13 @@
+{% include 'testhacks/base.html' %}
+<title>HackCollab - Create Team</title>
+{% block body %}
+    <div class="float-container" style="width: 50%;">
+      <h1>Create Team</h1>
+      <form class="form-group" method="post">
+        {% csrf_token %}
+        <input class="form-control my-5" type="text" name="name" placeholder="Team Name">
+        <textarea class="form-control my-5" name="description" rows="6" cols="50" placeholder="Team Description"></textarea>
+        <input class="btn btn-outline-primary btn-block my-5" type="submit" value="Create Team">
+      </form>
+    </div>
+{% endblock %}

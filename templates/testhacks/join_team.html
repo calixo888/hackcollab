@@ -1,0 +1,16 @@
+{% include 'testhacks/base.html' %}
+<title>HackCollab - Join Team</title>
+{% block body %}
+  <div class="float-container" style="width: 50%;">
+    <h1>Join Team Request</h1>
+    <p>
+      Write a request about why you want to join this team and why you would be a good person to work with
+    </p>
+    <form class="form-group" method="post">
+      {% csrf_token %}
+      <input class="form-control my-4" type="text" name="title" value="Join Team Request" placeholder="Title">
+      <textarea class="form-control my-4" name="description" rows="8" cols="80" placeholder="Description"></textarea>
+      <input class="btn btn-outline-primary btn-block my-4" type="submit" value="Send Request">
+    </form>
+  </div>
+{% endblock %}
