@@ -1,17 +1,7 @@
 {% load staticfiles %}
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="feature-icon" href="{% static 'img/cut-logo.png' %}"/>
-    <link rel="stylesheet" href="{% static 'hackcollab_app/index.css' %}">
-    <link rel="stylesheet" href="{% static 'hackcollab_app/documents.css' %}">
-    <link href="https://fonts.googleapis.com/css?family=Sulphur+Point&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <title>HackCollab - Privacy Policy</title>
-  </head>
-  <body>
+{% include 'hackcollab_app/base.html' %}
+<link rel="stylesheet" href="{% static 'hackcollab_app/documents.css' %}">
+{% block body %}
       <h1 class="header">Privacy Policy</h1>
       <div class="container">
           <h1 class="subheader">Privacy Policy of HackCollab</h1>
@@ -74,5 +64,4 @@
             If you have any questions or suggestions about our Privacy Policy, do not hesitate to contact us.
           </p>
       </div>
-  </body>
-</html>
+{% endblock %}
