@@ -24,8 +24,8 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 SECRET_KEY = 'e08zd_g8&un39rm!h@#&uv@ynw4ljxm#fp0m4f=lwke$3__i(^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-# DEBUG = False
+# DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_hosts.middleware.HostsResponseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'hackcollab_project.urls'

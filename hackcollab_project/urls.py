@@ -15,8 +15,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls import url
+from django.conf import settings
+from django.views.static import serve
+from hackcollab_app import views
+from hackcollab_app import views as hackcollab_app_views
+from django.conf.urls import handler404, handler500
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", include("hackcollab_app.urls")),
+    url(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}),
+    url(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
 ]
+
+handler404 = hackcollab_app_views.handler404
+handler500 = hackcollab_app_views.handler500
