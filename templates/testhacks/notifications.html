@@ -7,15 +7,17 @@
     <h1>Notifications</h1>
     {% if notifications %}
       <ul class="list-group">
-        {% for notification in notifications %}
+        {% for notification, team in notifications.items %}
           <div class="notification list-group-item">
             <h3>{{notification.title}}</h3>
             <p>
               {{notification.description}}
             </p>
-            <p>
-              <strong>From:</strong> <a href="{{notification.source_id}}">{{notification.source_id}}</a>
-            </p>
+            {% if team %}
+              <p>
+                <strong>From:</strong> <a href="/team/{{team.id}}">{{team.name}}</a>
+              </p>
+            {% endif %}
             {% if notification.type == "action" %}
               <div class="btn-group">
                 <a class="btn btn-primary" href="/accept-invite?team_id={{notification.source_id}}&user_id={{request.user.testhacks_profile.id}}&notification_id={{notification.id}}">Accept</a>

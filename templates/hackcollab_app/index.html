@@ -6,11 +6,13 @@
     <img class="logo" src="{% static 'img/full-logo-white.png' %}" alt="HackCollab Logo">
     <div class="center-container text-center">
       <h1 class="main-header">HackCollab</h1>
-      <h3 class="subheader">
-        Build hackathon teams now.
+      <h3 class="subheader responsive-subheader">
+        Form hackathon teams now.
       </h3>
-      <button class="w-45 solid-cta-button" type="button" name="button" onclick="document.getElementById('contact-us').scrollIntoView({behavior: 'smooth'});">Contact Us!</button>
-      <button class="w-45 ghost-cta-button" type="button" name="button" onclick="window.location.href = 'http://testhacks.hackcollab.io'">Demo it!</button>
+      <div class="cta-buttons">
+        <button class="w-45 solid-cta-button cta-button" type="button" name="button" onclick="document.getElementById('contact-us').scrollIntoView({behavior: 'smooth'});">Contact Us!</button>
+        <button class="w-45 ghost-cta-button cta-button" type="button" name="button" onclick="window.location.href = 'http://testhacks.hackcollab.io'">Demo it!</button>
+      </div>
     </div>
   </section>
   <div class="background-container">
@@ -99,7 +101,7 @@
             Compete Better
           </h3>
           <p class="feature-description">
-            Instead of carrying on with awkward and unproductive team-building exercises for competitors not yet part of a team, HackCollab allows competitors to form their own teams. This ensures each member will have a role to play in a team that they're comfortable with. This helps those with social anxiety issues find a place in the hackathon.
+            Instead of carrying on with awkward and unproductive team-building exercises for competitors not yet part of a team, HackCollab allows competitors to form their own teams. This ensures each member will have a role to play in a team that they're comfortable with.
           </p>
         </div>
       </div>
@@ -142,7 +144,8 @@
       <p class="contact-us-description text-center">
         We guarantee a response within 24 hours!
       </p>
-      <form class="contact-us-form" method="post">
+      <form class="contact-us-form" enctype="multipart/form-data" method="post">
+        {% csrf_token %}
         <label for="#name">Name:</label>
         <input class="form-input" id="name" type="text" name="name" placeholder="Name">
 
@@ -158,7 +161,7 @@
   </div>
 
   <footer class="footer">
-    <img src="{% static 'img/full-logo-white.png' %}" alt="HackCollab Logo" class="footer-logo logo">
+    <img src="{% static 'img/full-logo-white.png' %}" alt="HackCollab Logo" class="footer-logo">
     <div class="footer-grid">
       <div class="text-center contact-info">
         <h1 class="subheader footer-subheader">Contact Information</h1>

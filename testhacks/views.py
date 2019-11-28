@@ -11,6 +11,8 @@ from random import randint
 import json
 import datetime
 
+team_limit = 2
+
 # Function to create random ID for users and teams
 def random_with_N_digits(n):
     range_start = 10**(n-1)
@@ -19,6 +21,9 @@ def random_with_N_digits(n):
 
 def index(request):
     return render(request, "testhacks/index.html")
+
+def hackathon_info(request):
+    return render(request, "testhacks/hackathon_info.html")
 
 def register(request):
     # Check if form was submitted
@@ -196,7 +201,28 @@ def update(request):
 @login_required(login_url="/login/")
 def competitors(request):
     # Loads and displays all competitors within hackathon circle
-    competitors = models.UserProfile.objects.all()
+    competitors = {}
+    for competitor in models.UserProfile.objects.all():
+        # [able to invite (are they on your team already?), does your team have max limit?]
+        # [invite, max]
+        parameters = {}
+        if request.user.testhacks_profile.team_id:
+            if request.user.testhacks_profile.team_id == competitor.team_id:
+                parameters["invite"] = False
+            else:
+                parameters["invite"] = True
+        else:
+            parameters["invite"] = False
+
+        team_members = models.UserProfile.objects.filter(team_id=request.user.testhacks_profile.team_id)
+        if len(team_members) >= team_limit:
+            parameters["max"] = True
+        else:
+            parameters["max"] = False
+
+        competitors[competitor] = parameters
+
+    print(competitors)
     return render(request, "testhacks/competitors.html", context={"competitors": competitors})
 
 @login_required(login_url="/login/")
@@ -209,7 +235,7 @@ def create_team(request):
         description = data.get("description")
 
         # Creating team with unique and branded ID
-        team = models.Team(id="team-" + str(random_with_N_digits(8)), name=name, description=description)
+        team = models.Team(id="team-" + str(random_with_N_digits(8)), name=name, description=description, leader=request.user.testhacks_profile.id)
         team.save()
 
         # Getting currently authenticated user and setting their team_id to team created
@@ -241,10 +267,34 @@ def teams(request):
 
 @login_required(login_url="/login/")
 def notifications(request):
-    notifications = models.Notification.objects.filter(target_id=request.user.testhacks_profile.id)
+    notifications = {}
+    # Grabbing teams for each action notification
+    for notification in models.Notification.objects.filter(target_id=request.user.testhacks_profile.id):
+        if notification.type == "action":
+            team = models.Team.objects.get(id=notification.source_id)
+            notifications[notification] = team
+        else:
+            notifications[notification] = False
 
     return render(request, "testhacks/notifications.html", context={"notifications": notifications})
 
+def contact_support(request):
+    if request.method == "POST":
+        # Grabbing information from contact us form
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        message = request.POST.get("message")
+
+        # Sending the email
+        EmailMessage("HackCollab - testhacks Contact Us", "From: " + name + "\n\n" + message + "\n\nEmail: " + email, to=["calix.huang1@gmail.com"]).send()
+
+        # Redirecting to success page
+        return HttpResponseRedirect("/success/")
+
+    return render(request, "testhacks/contact_support.html")
+
+def success(request):
+    return render(request, "testhacks/success.html")
 
 @login_required(login_url="/login/")
 def view_profile(request, user_id):
@@ -276,12 +326,41 @@ def view_team(request, team_id):
 
         return render(request, "testhacks/team.html", context={
             "team": team,
+            "leader": models.UserProfile.objects.get(id=team.leader),
             "teammates": teammates,
             "notifications": notifications
         })
     else:
         # Return error if user is not part of the team
         return HttpResponse("You are not on this team.")
+
+@login_required(login_url="/login/")
+def kickout(request):
+    # Get user ID
+    member_id = request.GET.get("member_id")
+
+    # Get user profile_picture
+    member = models.UserProfile.objects.get(id=member_id)
+
+    # Send success message
+    messages.success(request, member.user.username + " was kicked out.")
+
+    # Instantiating titles and descriptions
+    title = "You've been kicked out of your team."
+    description = "We're sorry, but the team leader has kicked you out of the team. Please visit your notifications page for more details."
+
+    # Send email to kicked out member
+    EmailMessage(title, description, to=[member.user.email]).send()
+
+    # Send notification to member
+    notification = models.Notification(id="notification-" + str(random_with_N_digits(8)), title=title, description=description, source_id=member.team_id, target_id=member.id, type="info")
+    notification.save()
+
+    # Kicking them out
+    member.team_id = None
+    member.save()
+
+    return HttpResponseRedirect("/")
 
 @login_required(login_url="/login/")
 def join_team(request, team_id):
@@ -299,7 +378,7 @@ def join_team(request, team_id):
         # Sending email to each member of team
         for profile in models.UserProfile.objects.filter(team_id=team_id):
             email = profile.user.email
-            EmailMessage("Join Team Request", "Please view your team page for more information", to=[email]).send()
+            EmailMessage("Join Team Request", profile.user.username + " has requested to join your team. Please visit your team pae to accept or reject it.", to=[email]).send()
 
         messages.success(request, "Join Team request successfully sent!")
 
@@ -321,7 +400,7 @@ def leave_team(request, team_id):
     # Sending email to whole team
     for temp_profile in models.UserProfile.objects.filter(team_id=team_id):
         email = temp_profile.user.email
-        EmailMessage(profile.user.username + " has the left the team", "Please view your team page for more information", to=[email]).send()
+        EmailMessage(profile.user.username + " has the left the team", "Please view your team page for more information.", to=[email]).send()
 
     messages.success(request, "Team successfully left.")
 
@@ -344,7 +423,7 @@ def invite_to_team(request):
         profile = models.UserProfile.objects.get(id=target_id)
         email = profile.user.email
         print(email)
-        email_message = EmailMessage("Team invitation received", "Please view your team page for more information", to=[email])
+        email_message = EmailMessage("Team invitation received", "You have been requested to join a team. Please view your notifications page to accept or reject it.", to=[email])
         email_message.send()
 
         messages.success(request, "Team invitation successfully sent!")
@@ -372,7 +451,7 @@ def accept_user(request):
 
     profile = models.UserProfile.objects.get(id=user_id)
     email = profile.user.email
-    EmailMessage("Join Team Request Accepted!", "Please view your team page for more information", to=[email]).send()
+    EmailMessage("Join Team Request Accepted!", "Your join team request has been accepted! Please view your team page for more information.", to=[email]).send()
 
     # Adding user to team
     profile = models.UserProfile.objects.get(id=user_id)
@@ -403,7 +482,7 @@ def reject_user(request):
     # Sending email to user
     profile = models.UserProfile.objects.get(id=user_id)
     email = profile.user.email
-    EmailMessage("Join Team Request Rejected", "Please view your team page for more information", to=[email]).send()
+    EmailMessage("Join Team Request Rejected", "We're sorry, but your join team request has been rejected. Please view your team page for more information.", to=[email]).send()
 
     messages.success(request, "Team invitations successfully rejected.")
 
@@ -432,7 +511,7 @@ def accept_invite(request):
     # Sending email to each member of team
     for profile in models.UserProfile.objects.filter(team_id=team_id):
         email = profile.user.email
-        EmailMessage("Team invitiation Accepted!", "Please view your team page for more information", to=[email]).send()
+        EmailMessage("Team invitiation Accepted!", "Your team invitation has been accepted! Please view your team page for more information.", to=[email]).send()
 
     messages.success(request, "Team invitation successfully accepted!")
 
@@ -458,7 +537,7 @@ def reject_invite(request):
     # Sending email to each member of team
     for profile in models.UserProfile.objects.filter(team_id=team_id):
         email = profile.user.email
-        EmailMessage("Team invitation rejected", "Please view your team page for more information", to=[email]).send()
+        EmailMessage("Team invitation rejected", "We're sorry, but your team invitiation has been rejected. Please view your team page for more information", to=[email]).send()
 
     messages.success(request, "Team invite successfully rejected.")
 

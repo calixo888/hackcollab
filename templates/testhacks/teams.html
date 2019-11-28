@@ -5,25 +5,34 @@
 {% block body %}
     <h1 class="header">Teams</h1>
     <div class="container">
-      <div class="teams">
-        {% for team, teammates in teams.items %}
-          <div class="team">
-            <h2>{{team.name}}</h2>
-            <p>
-              <strong>Description:</strong> {{team.description}}
-            </p>
-            <h4>Team Members</h4>
-            <ul class="team-members-list">
-              {% for teammate in teammates %}
-                <li><a href="/profile/{{teammate.id}}">{{teammate.user.username}}</a></li>
-              {% endfor %}
-            </ul>
-            <div class="btn-group btn-block" role="group" aria-label="Basic example">
-              <a class="btn btn-primary" href="/team/{{team.id}}">View Team</a>
-              <a class="btn btn-primary" href="/join-team/{{team.id}}">Join this Team</a>
+      {% if teams %}
+        <div class="teams">
+          {% for team, teammates in teams.items %}
+            <div class="team">
+              <h2>{{team.name}}</h2>
+              <p>
+                <strong>Description:</strong> {{team.description}}
+              </p>
+              <strong>Team Members:</strong>
+              <ul class="team-members-list fa-ul">
+                {% for teammate in teammates %}
+                  <li>
+                    <span class="fa-li"><i class="fas fa-angle-right"></i></span>
+                    <a style="color: black;" href="/profile/{{teammate.id}}">{{teammate.user.username}}</a>
+                  </li>
+                {% endfor %}
+              </ul>
+              <div class="blur-in">
+                <a class="btn btn-outline-light" href="/team/{{team.id}}">View Team</a>
+                <a class="btn btn-outline-light" href="/join-team/{{team.id}}">Join this Team</a>
+              </div>
             </div>
-          </div>
-        {% endfor %}
-      </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center">
+          <small style="color: white;">No teams yet!</small>
+        </div>
+      {% endif %}
     </div>
 {% endblock %}

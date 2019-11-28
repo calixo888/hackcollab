@@ -1,0 +1,12 @@
+{% load staticfiles %}
+{% include 'hackcollab_app/base.html' %}
+<link rel="stylesheet" href="{% static 'hackcollab_app/success.css' %}">
+{% block body %}
+  <h1 class="header">Success!</h1>
+  <p class="w-50 text-center m-auto" style="font-size: 25px;">
+    Thank you so much for contacting us! We promise we will respond to you within the next 12 hours. If you do not hear a response back by then, please feel free to contact us again.
+  </p>
+  <div class="text-center m-3">
+    <a href="/" class="ghost-cta-button">Home Page</a>
+  </div>
+{% endblock %}

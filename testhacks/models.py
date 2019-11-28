@@ -39,6 +39,7 @@ class Team(models.Model):
     id = models.CharField(primary_key=True, unique=True, max_length=15)
     name = models.CharField(max_length=50)
     description = models.TextField()
+    leader = models.CharField(max_length=10)
 
     def __str__(self):
         return self.name

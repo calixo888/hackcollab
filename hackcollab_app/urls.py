@@ -10,6 +10,7 @@ app_name = "hackcollab_app"
 urlpatterns = [
     path('admin/', admin.site.urls),
     url("^$", views.index, name="index"),
+    url("^success", views.success, name="success"),
     url("^privacy-policy", views.privacy_policy, name="privacy_policy"),
     url("^terms-and-conditions", views.terms_and_conditions, name="terms_and_conditions"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
