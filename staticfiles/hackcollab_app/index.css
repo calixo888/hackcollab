@@ -15,8 +15,10 @@
   font-weight: 600;
 }
 
-html {
+body, html {
   scroll-behavior: smooth;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 p {
@@ -40,7 +42,7 @@ section {
 }
 
 .main-header {
-  font-size: 100px;
+  font-size: 10vw;
   font-weight: bold;
 }
 
@@ -73,18 +75,21 @@ section {
 
 .ghost-cta-button {
   background-color: transparent;
-  border: 1px solid var(--secondary-color);
+  border: 1px solid white;
   border-radius: 5px;
   padding: 10px 15px;
   font-size: 20px;
   cursor: pointer;
   transition: all .2s;
   outline: none;
+  color: white;
+  text-decoration: none;
 }
 
 .ghost-cta-button:hover {
-  background-color: var(--secondary-color);
+  background-color: white;
   color: black;
+  text-decoration: none;
 }
 
 .center-container {
@@ -103,10 +108,24 @@ section {
 .home {
   min-height: 100vh;
   padding: 0;
+  background-image: linear-gradient(to right bottom, rgba(0, 202, 237, 0.8), rgba(0, 110, 255, 0.8)), url("../img/background.png");
+  background-size: cover;
 }
 
 .logo {
-  width: 250px;
+  width: 200px;
+  margin: 25px;
+}
+
+.cta-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  margin: 0 auto;
+  grid-gap: 10px;
+}
+
+.cta-button {
+  width: 100%;
 }
 
 
@@ -165,7 +184,7 @@ section {
 
 .qa {
   display: grid;
-  grid-template-columns: 30% 70%;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   font-size: 20px;
 }
 
@@ -224,6 +243,7 @@ section {
 .footer-logo {
   display: block;
   margin: 0 auto 50px auto;
+  width: 300px;
 }
 
 .footer-grid {
