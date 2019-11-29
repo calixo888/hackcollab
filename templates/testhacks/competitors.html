@@ -14,6 +14,7 @@
                   <img class="profile-picture" src="/media/{{competitor.profile_picture}}" alt="">
                 </div>
                 <a href="/profile/{{competitor.id}}"><h4>{{competitor.user.username}}</h4></a>
+                <p style="margin-bottom: 0 !important;">{{competitor.title}}</p>
                 {% if request.user.testhacks_profile.team_id %}
                   {% if parameters.invite %}
                     {% if parameters.max %}

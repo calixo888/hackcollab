@@ -35,7 +35,7 @@ def register(request):
         first_name = data.get("first_name")
         last_name = data.get("last_name")
         birthday = data.get("birthday")
-        school = data.get("school")
+        title = data.get("title")
         gender = data.get("gender")
         email = data.get("email")
         phone_number = data.get("phone_number")
@@ -62,7 +62,7 @@ def register(request):
         user.save()
 
         # Creating and saving user profile - linked to User
-        profile = models.UserProfile(user=user, id=random_with_N_digits(8), birthday=birthday, school=school, gender=gender, phone_number=phone_number, areas_of_expertise=areas_of_expertise, past_accomplishments=past_accomplishments, github_link=github_link, linkedin_link=linkedin_link, personal_website_link=personal_website_link, profile_picture=profile_picture, communication=communication, public_speaking=public_speaking, teamwork=teamwork, leadership=leadership)
+        profile = models.UserProfile(user=user, id=random_with_N_digits(8), birthday=birthday, title=title, gender=gender, phone_number=phone_number, areas_of_expertise=areas_of_expertise, past_accomplishments=past_accomplishments, github_link=github_link, linkedin_link=linkedin_link, personal_website_link=personal_website_link, profile_picture=profile_picture, communication=communication, public_speaking=public_speaking, teamwork=teamwork, leadership=leadership)
 
         # Grabbing profile picture
         if 'profile_picture' in request.FILES: # checking if they provided picture
@@ -118,7 +118,7 @@ def update(request):
         first_name = data.get("first_name")
         last_name = data.get("last_name")
         birthday = data.get("birthday")
-        school = data.get("school")
+        title = data.get("title")
         gender = data.get("gender")
         email = data.get("email")
         phone_number = data.get("phone_number")

@@ -36,3 +36,6 @@ urlpatterns = [
     # Password reset URLs
     url('^', include('django.contrib.auth.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+handler404 = 'hackcollab_app.views.handler404'
+handler500 = 'hackcollab_app.views.handler500'

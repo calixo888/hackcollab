@@ -11,7 +11,7 @@ class UserForm(forms.ModelForm):
     username = forms.CharField(label="Username *", required=True, widget=forms.TextInput(attrs={"class": "form-control form-input", "placeholder": "Username"}))
     password = forms.CharField(label="Password *", required=True, widget=forms.PasswordInput(attrs={"class": "form-control form-input", "placeholder": "Password"}))
     birthday = forms.DateField(label="Birthday *", required=True)
-    school = forms.CharField(label="School *", required=True, widget=forms.TextInput(attrs={"class": "form-control form-input", "placeholder": "School"}))
+    title = forms.CharField(label="Title *", required=True, widget=forms.TextInput(attrs={"class": "form-control form-input", "placeholder": "Title"}))
 
     gender_choices = (
         ('Male', "Male"),
@@ -43,4 +43,4 @@ class UserForm(forms.ModelForm):
 
     class Meta:
         model = models.UserProfile
-        fields = ('first_name', 'last_name', 'email', 'username', 'password', 'birthday', 'school', 'gender', 'phone_number', 'areas_of_expertise', 'past_accomplishments', 'github_link', 'linkedin_link', 'personal_website_link', 'profile_picture',)
+        fields = ('first_name', 'last_name', 'email', 'username', 'password', 'birthday', 'title', 'gender', 'phone_number', 'areas_of_expertise', 'past_accomplishments', 'github_link', 'linkedin_link', 'personal_website_link', 'profile_picture',)

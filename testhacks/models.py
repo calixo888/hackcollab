@@ -7,7 +7,7 @@ class UserProfile(models.Model):
     id = models.IntegerField(unique=True, primary_key=True, blank=True)
     team_id = models.CharField(max_length=15, null=True, blank=True)
     birthday = models.DateField()
-    school = models.CharField(max_length=100)
+    title = models.CharField(max_length=100)
     gender = models.CharField(max_length=30)
     phone_number = models.CharField(max_length=30, blank=True)
     # notification_type = models.CharField(max_length=10) # Email, phone, or both
