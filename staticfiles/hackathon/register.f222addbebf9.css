@@ -1,0 +1,29 @@
+body {
+  overflow: visible;
+}
+
+.form-container {
+  background-color: white;
+  margin: 30px 100px;
+  border-radius: 5px;
+  box-shadow: 0 5px 10px rgba(0,0,0,.3);
+  padding: 50px;
+}
+
+.form-container > h1 {
+  text-align: center;
+}
+
+small {
+  display: block;
+  text-align: center;
+}
+
+#id_gender {
+  border: 1px solid #ccc;
+  padding: 30px;
+}
+
+#id_gender:focus {
+  outline: none;
+}

@@ -1,0 +1,38 @@
+.teams {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-gap: 50px;
+}
+
+.team {
+  position: relative;
+  background-color: white;
+  padding: 30px;
+  border-radius: 5px;
+  box-shadow: 0 5px 10px rgba(0,0,0,.3);
+  transition: all .2s;
+}
+
+.team:hover {
+  /* filter: brightness(50%), blur(50px);
+  -webkit-filter: brightness(50%), blur(50px); */
+  background-color: rgb(64, 64, 64);
+}
+
+.team:hover .blur-in {
+  display: block;
+}
+
+.blur-in {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  width: 100%;
+  text-align: center;
+}
+
+.blur-in a {
+  width: 40%;
+}

@@ -1,4 +1,15 @@
+{% load staticfiles %}
 {% include 'hackcollab_app/base.html' %}
+<title>HackCollab - Page Not Found!</title>
+<link rel="stylesheet" href="{% static 'hackcollab_app/documents.css' %}">
 {% block body %}
-  <h1>404</h1>
+  <h1 class="header">404 - Page Not Found!</h1>
+  <div class="container">
+    <p class="text-center w-50 m-auto" style="font-size: 20px;">
+      We're sorry, but the page you're looking for doesn't exist! If you think this is a serious issue, please feel free to contact us!
+    </p>
+    <div class="my-5 text-center">
+      <a class="ghost-cta-button" href="/">Home Page</a>
+    </div>
+  </div>
 {% endblock %}

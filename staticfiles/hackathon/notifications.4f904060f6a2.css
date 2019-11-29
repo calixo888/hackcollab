@@ -1,0 +1,10 @@
+.x {
+  position: absolute;
+  right: 50px;
+  top: 45%;
+  transform: translateY(-50%);
+  border: none;
+  background-color: transparent;
+  color: #ccc;
+  font-size: 50px;
+}
