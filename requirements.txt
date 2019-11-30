@@ -2,3 +2,5 @@ Django==2.2.7
 gunicorn==20.0.0
 whitenoise==4.1.4
 django_hosts==3.0
+markdown2==2.3.8
+html2markdown==0.1.7
