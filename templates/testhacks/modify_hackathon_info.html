@@ -1,0 +1,14 @@
+{% load staticfiles %}
+{% include 'testhacks/base.html' %}
+<link rel="stylesheet" href="{% static 'hackathon/modify_hackathon_info.css' %}">
+<title>HackCollab - Modify Hackathon Information</title>
+{% block body %}
+  <h1 class="header">Modify Hackathon Information</h1>
+  <form class="hackathon-info-form w-50 m-auto" method="post">
+    {% csrf_token %}
+    <textarea class="hackathon-info-input form-control" name="hackathon_info" rows="20">{{markdown}}</textarea>
+    <div class="text-center my-3">
+      <input class="btn btn-outline-light btn-lg" type="submit" value="Update Info">
+    </div>
+  </form>
+{% endblock %}

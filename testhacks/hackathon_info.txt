@@ -1,0 +1,10 @@
+<h1>Hackathon Information Title</h1>
+
+<p>If you are part of staff, you can modify the text here to the hackathon information</p>
+
+<h1>For hackathon organizers</h1>
+
+<p>To test some of the permissions of the staff accounts, please login to the pre-made staff account.</p>
+
+<p>Username: Organizer <br />
+Password: organizer</p>

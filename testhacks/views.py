@@ -4,14 +4,22 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.core.mail import EmailMessage
+from django.utils.safestring import mark_safe
 from random import randint
 import json
 import datetime
+import os
+import shutil
 
-team_limit = 2
+# Markdown/HTML libraries
+import markdown2
+import html2markdown
+
+team_limit = 4
 
 # Function to create random ID for users and teams
 def random_with_N_digits(n):
@@ -20,10 +28,9 @@ def random_with_N_digits(n):
     return randint(range_start, range_end)
 
 def index(request):
+    media_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/media"
+    print(os.listdir(media_dir))
     return render(request, "testhacks/index.html")
-
-def hackathon_info(request):
-    return render(request, "testhacks/hackathon_info.html")
 
 def register(request):
     # Check if form was submitted
@@ -69,7 +76,10 @@ def register(request):
             profile.profile_picture = request.FILES['profile_picture']
 
         else:
-            profile.profile_picture = "default.png"
+            filename = "default-" + username + ".png"
+            media_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/media/"
+            shutil.copyfile(media_dir + "default.png", media_dir + filename)
+            profile.profile_picture = filename
 
         profile.save()
 
@@ -203,8 +213,6 @@ def competitors(request):
     # Loads and displays all competitors within hackathon circle
     competitors = {}
     for competitor in models.UserProfile.objects.all():
-        # [able to invite (are they on your team already?), does your team have max limit?]
-        # [invite, max]
         parameters = {}
         if request.user.testhacks_profile.team_id:
             if request.user.testhacks_profile.team_id == competitor.team_id:
@@ -222,7 +230,6 @@ def competitors(request):
 
         competitors[competitor] = parameters
 
-    print(competitors)
     return render(request, "testhacks/competitors.html", context={"competitors": competitors})
 
 @login_required(login_url="/login/")
@@ -542,6 +549,29 @@ def reject_invite(request):
     messages.success(request, "Team invite successfully rejected.")
 
     return HttpResponseRedirect("/")
+
+def hackathon_info(request):
+    html_file = open(os.path.dirname(__file__) + "/hackathon_info.txt", "r")
+    html = html_file.read()
+
+    return render(request, "testhacks/hackathon_info.html", context={"html": mark_safe(html)})
+
+@staff_member_required
+@login_required(login_url="/login/")
+def modify_hackathon_info(request):
+    if request.method == "POST":
+        new_info = request.POST.get("hackathon_info")
+
+        html = markdown2.markdown(new_info)
+        html_file = open(os.path.dirname(__file__) + "/hackathon_info.txt", "w")
+        html_file.write(html)
+
+        return HttpResponseRedirect("/hackathon-info/")
+
+    html_file = open(os.path.dirname(__file__) + "/hackathon_info.txt", "r")
+    markdown = html2markdown.convert(html_file.read())
+
+    return render(request, "testhacks/modify_hackathon_info.html", context={"markdown": markdown})
 
 
 # POST REQUEST

@@ -14,6 +14,7 @@ urlpatterns = [
     url("^logout", views.user_logout, name="logout"),
     url("^update", views.update, name="update"),
     url("^hackathon-info", views.hackathon_info, name="hackathon_info"),
+    url("^modify-hackathon-info", views.modify_hackathon_info, name="modify_hackathon_info"),
     url("^competitors", views.competitors, name="competitors"),
     url("^teams", views.teams, name="teams"),
     url("^notifications", views.notifications, name="notifications"),

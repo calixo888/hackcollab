@@ -1,0 +1,12 @@
+.hackathon-info-input {
+  box-shadow: 0 5px 10px rgba(0,0,0,.3);
+}
+
+.hackathon-info-input:focus {
+  outline: none;
+}
+
+body {
+  padding-bottom: 50px;
+  overflow: visible;
+}
