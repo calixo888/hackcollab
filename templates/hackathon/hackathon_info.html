@@ -1,0 +1,15 @@
+{% load staticfiles %}
+{% include 'hackathon/base.html' %}
+<link rel="stylesheet" href="{% static 'hackathon/hackathon_info.css' %}">
+<title>HackCollab - {{hackathon.formal_name}}</title>
+{% block body %}
+  <h1 class="header">{{hackathon.formal_name}} Information</h1>
+  <div class="info w-50 m-auto">
+    {{html}}
+  </div>
+  {% if request.user.is_staff %}
+    <div class="text-center my-5">
+      <a class="btn btn-outline-light btn-lg" href="/modify-hackathon-info/">Modify</a>
+    </div>
+  {% endif %}
+{% endblock %}

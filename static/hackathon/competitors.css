@@ -1,3 +1,14 @@
+body {
+  overflow: visible;
+}
+
+.subheader {
+  font-size: 40px;
+  font-weight: bold;
+  color: white;
+  margin: 30px;
+}
+
 .competitors {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));

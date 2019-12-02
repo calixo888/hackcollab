@@ -1,0 +1,71 @@
+{% load staticfiles %}
+{% include 'hackathon/base.html' %}
+<link rel="stylesheet" href="{% static 'hackathon/teams.css' %}">
+<link rel="stylesheet" href="{% static 'hackathon/competitors.css' %}">
+{% block body %}
+  <style>
+    /* Removing darken hover effect */
+    .team:hover {
+      background-color: white;
+    }
+  </style>
+  <div class="p-5">
+    <h1 class="header">Administrator View</h1>
+    <h1 class="subheader">Competitors</h1>
+    <div class="container">
+      {% if competitors %}
+        <div class="competitors">
+          {% for competitor in competitors %}
+            {% if competitor != request.user.profile %}
+              {% if not competitor.user.is_staff %}
+                {% if not competitor.user.is_superuser %}
+                  <div class="competitor">
+                    <div class="image-cropper">
+                      <img class="profile-picture" src="/media/{{competitor.profile_picture}}" alt="">
+                    </div>
+                    <a href="/profile/{{competitor.id}}"><h4>{{competitor.user.username}}</h4></a>
+                    <p style="margin-bottom: 0 !important;">{{competitor.title}}</p>
+                    <a href="/delete-user?id={{competitor.id}}" class="btn btn-outline-primary mt-3">Delete User</a>
+                  </div>
+                {% endif %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center">
+          <small style="color: white;">No competitors yet!</small>
+        </div>
+      {% endif %}
+    </div>
+    <h1 class="subheader">Teams</h1>
+    <div class="container">
+      {% if teams %}
+        <div class="teams">
+          {% for team, teammates in teams.items %}
+            <div class="team">
+              <h2>{{team.name}}</h2>
+              <p>
+                <strong>Description:</strong> {{team.description}}
+              </p>
+              <strong>Team Members:</strong>
+              <ul class="team-members-list fa-ul">
+                {% for teammate in teammates %}
+                  <li>
+                    <span class="fa-li"><i class="fas fa-angle-right"></i></span>
+                    <a style="color: black;" href="/profile/{{teammate.id}}">{{teammate.user.username}}</a>
+                  </li>
+                {% endfor %}
+              </ul>
+              <a href="/delete-team?id={{team.id}}" class="btn btn-outline-primary">Delete Team</a>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center">
+          <small style="color: white;">No teams yet!</small>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

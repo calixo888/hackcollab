@@ -1,0 +1,25 @@
+{% load staticfiles %}
+{% include 'hackathon/base.html' %}
+<link rel="stylesheet" href="{% static 'hackathon/contact_support.css' %}">
+<title>HackCollab - Contact Support</title>
+{% block body %}
+  <div class="content">
+    <h1 class="header">Contact Us</h1>
+    <p class="contact-us-description text-center">
+      We guarantee a response within 12 hours!
+    </p>
+    <form class="contact-us-form" enctype="multipart/form-data" method="post">
+      {% csrf_token %}
+      <label for="#name">Name:</label>
+      <input class="form-input" id="name" type="text" name="name" placeholder="Name">
+
+      <label for="#email">Email Address:</label>
+      <input class="form-input" id="email" type="email" name="email" placeholder="Email">
+
+      <label for="#message">Message:</label>
+      <textarea class="form-input" id="message" name="message" rows="6" placeholder="Message"></textarea>
+
+      <input class="ghost-cta-button" type="submit" value="Contact Us">
+    </form>
+  </div>
+{% endblock %}

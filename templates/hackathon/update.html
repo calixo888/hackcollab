@@ -1,0 +1,55 @@
+{% load staticfiles %}
+{% include 'hackathon/base.html' %}
+<title>HackCollab - Update Profile</title>
+<link rel="stylesheet" href="{% static 'hackathon/register.css' %}">
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+{% block body %}
+  <div class="container">
+    <div class="form-container">
+      <h1>Update Profile</h1>
+      <form class="" enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+        {{form.as_p}}
+        <h3>Rate your soft skills</h3>
+        <label for=".communication-container">Communication:</label>
+        <div class="communication-container">
+          <label for="#communication" id="communicationInput">{{communication}}</label>
+          <input id="communication" type="range" name="communication" min="0" max="10" value="{{communication}}" onchange="updateTextInput(this.value, 'communicationInput');">
+        </div>
+
+        <label for=".public-speaking-container">Public Speaking:</label>
+        <div class="public-speaking-container">
+          <label for="#public-speaking" id="public-speakingInput">{{public_speaking}}</label>
+          <input id="public-speaking" type="range" name="public-speaking" min="0" max="10" value="{{public_speaking}}" onchange="updateTextInput(this.value, 'public-speakingInput');">
+        </div>
+
+        <label for=".teamwork-container">Teamwork:</label>
+        <div class="teamwork-container">
+          <label for="#teamwork" id="teamworkInput">{{teamwork}}</label>
+          <input id="teamwork" type="range" name="teamwork" min="0" max="10" value="{{teamwork}}" onchange="updateTextInput(this.value, 'teamworkInput');">
+        </div>
+
+        <label for=".leadership-container">Leadership:</label>
+        <div class="leadership-container">
+          <label for="#leadership" id="leadershipInput">{{leadership}}</label>
+          <input id="leadership" type="range" name="leadership" min="0" max="10" value="{{leadership}}" onchange="updateTextInput(this.value, 'leadershipInput');">
+        </div>
+        <input class="btn btn-outline-primary btn-block" type="submit" value="Update Profile">
+      </form>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script>
+    function updateTextInput(val, id) {
+      document.getElementById(id).innerHTML=val;
+    }
+
+    $( function() {
+      $( "#id_birthday" ).datepicker();
+    } );
+
+    document.querySelector("#id_password").removeAttribute("required")
+    document.querySelector("#id_password").parentElement.style.display = "none"
+  </script>
+{% endblock %}

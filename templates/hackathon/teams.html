@@ -1,0 +1,38 @@
+{% load staticfiles %}
+{% include 'hackathon/base.html' %}
+<title>HackCollab - Teams</title>
+<link rel="stylesheet" href="{% static 'hackathon/teams.css' %}">
+{% block body %}
+    <h1 class="header">Teams</h1>
+    <div class="container">
+      {% if teams %}
+        <div class="teams">
+          {% for team, teammates in teams.items %}
+            <div class="team">
+              <h2>{{team.name}}</h2>
+              <p>
+                <strong>Description:</strong> {{team.description}}
+              </p>
+              <strong>Team Members:</strong>
+              <ul class="team-members-list fa-ul">
+                {% for teammate in teammates %}
+                  <li>
+                    <span class="fa-li"><i class="fas fa-angle-right"></i></span>
+                    <a style="color: black;" href="/profile/{{teammate.id}}">{{teammate.user.username}}</a>
+                  </li>
+                {% endfor %}
+              </ul>
+              <div class="blur-in">
+                <a class="btn btn-outline-light" href="/team/{{team.id}}">View Team</a>
+                <a class="btn btn-outline-light" href="/join-team/{{team.id}}">Join this Team</a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center">
+          <small style="color: white;">No teams yet!</small>
+        </div>
+      {% endif %}
+    </div>
+{% endblock %}
