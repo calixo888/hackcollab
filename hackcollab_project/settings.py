@@ -25,8 +25,8 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 SECRET_KEY = 'e08zd_g8&un39rm!h@#&uv@ynw4ljxm#fp0m4f=lwke$3__i(^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = False
+DEBUG = True
+# DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -88,6 +88,17 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': os.environ.get('DB_NAME', 'sample_database'),
+#         'USER': os.environ.get('DB_USER', 'sample'),
+#         'PASSWORD': os.environ.get('DB_PASS', 'sample'),
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
 
 
 # Password validation
