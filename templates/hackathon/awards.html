@@ -1,0 +1,33 @@
+{% load staticfiles %}
+{% include 'hackathon/base.html' %}
+<title>HackCollab - Awards</title>
+<link rel="stylesheet" href="{% static 'hackathon/awards.css' %}">
+{% block body %}
+  <h1 class="header">Awards</h1>
+  <div class="container">
+    {% if awards %}
+      <div class="awards-grid">
+        {% for award, team in awards.items %}
+          <div class="award">
+            <h3>{{award.title}}</h3>
+            <p>
+              <strong>Description:</strong> {{award.description}}
+            </p>
+            <p>
+              <strong>Prize:</strong> {{award.prize}}
+            </p>
+            {% if not team %}
+              <small><strong>Winner not announced yet!</strong></small>
+            {% else %}
+              <strong>Winner:</strong> <a href="/view-team/{{team.id}}">{{team.name}}</a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="text-center">
+        <small style="color: white;">No awards yet!</small>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

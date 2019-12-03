@@ -1,0 +1,35 @@
+{% include 'hackathon/base.html' %}
+<title>HackCollab - Team Submissions</title>
+{% block body %}
+  <style>
+    .submission-item {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+    }
+  </style>
+  <h1 class="header">Team Submissions</h1>
+  <div class="container">
+    {% if submissions %}
+      <ul class="list-group">
+        <p class="submission-item" style="color: white;">
+          <span>Counter</span>
+          <span>Team</span>
+          <span>Submission Name</span>
+          <span>Submission Description</span>
+        </p>
+        {% for number, team, submission in submissions %}
+          <li class="list-group-item submission-item">
+            <span>{{number}}.</span>
+            <a href="/team/{{team.id}}">{{team.name}}</a>
+            <span>{{submission.submission_name}}</span>
+            <span>{{submission.submission_description}}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="text-center">
+        <small style="color: white;">No submissions yet!</small>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

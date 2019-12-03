@@ -1,0 +1,14 @@
+{% include 'hackathon/base.html' %}
+{% block body %}
+  <div class="container">
+    <div class="float-container">
+      <h1 class="subheader">Submit</h1>
+      <form class="" method="post">
+        {% csrf_token %}
+        <input class="form-control mt-3" type="text" name="submission_name" placeholder="Project Name" required>
+        <textarea class="form-control my-5" name="submission_description" rows="6" placeholder="Project Description" required></textarea>
+        <input type="submit" class="btn btn-outline-primary btn-block" value="Submit!">
+      </form>
+    </div>
+  </div>
+{% endblock %}

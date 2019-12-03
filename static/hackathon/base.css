@@ -9,7 +9,7 @@ body {
   background-image: linear-gradient(to right bottom, rgb(69, 160, 255), rgb(0, 117, 255));
   background-size: cover;
   background-repeat: no-repeat;
-  overflow-y: hidden;
+  /* overflow-y: hidden; */
 }
 
 .logo {
@@ -20,16 +20,13 @@ body {
 }
 
 .float-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 75%;
-  height: 75%;
+  min-width: 75%;
+  min-height: 75%;
   background-color: white;
   padding: 50px;
   border-radius: 5px;
   box-shadow: 0 5px 8px rgba(0,0,0,.3);
+  margin: auto;
 }
 
 .float-container > h1 {

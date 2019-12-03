@@ -1,6 +1,6 @@
 {% load staticfiles %}
 {% include 'hackathon/base.html' %}
-<title>HackCollab - Home</title>
+<title>HackCollab - {{hackathon.formal_name}} Home</title>
 <link rel="stylesheet" href="{% static 'hackathon/index.css' %}">
 {% block body %}
   {% if request.user.is_authenticated %}

@@ -3,15 +3,19 @@ from . import models
 def add_variable_to_context(request):
     hackathon_name = request.get_host().split(".")[0]
 
-    # # Modifying team_id for each hackathon
-    # profile = request.user.testhacks_profile
-    # for hid in models.HackathonIdentification.objects.filter(hackathon_name=hackathon_name):
-    #     if models.TeamIdentification.objects.filter(team_id=hid.model_id, user_id=profile.id).exists():
-    #         profile.team_id = models.TeamIdentification.objects.get(team_id=hid.model_id, user_id=profile.id).team_id
-    #         profile.save()
-    #     else:
-    #         profile.team_id = None
-    #         profile.save()
+    # Modifying team_id for each hackathon
+    if request.user.is_authenticated:
+        profile = request.user.profile
+        for hid in models.HackathonIdentification.objects.filter(hackathon_name=hackathon_name):
+            if models.TeamIdentification.objects.filter(team_id=hid.model_id, user_id=profile.id).exists():
+                tid = models.TeamIdentification.objects.get(team_id=hid.model_id, user_id=profile.id)
+                print(tid.team_id)
+                profile.team_id = tid.team_id
+                profile.save()
+                break
+            else:
+                profile.team_id = None
+                profile.save()
 
     try:
         # Getting current hackathon from subdomain

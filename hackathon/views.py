@@ -264,12 +264,21 @@ def competitors(request):
     for hid in hids:
         if not hid.model_id.startswith("t") and not hid.model_id.startswith("n"):
             competitor = models.UserProfile.objects.get(id=hid.model_id)
-            hackathon_competitors.append(competitor)
+            if competitor != request.user.profile:
+                if not competitor.user.is_staff:
+                    if not competitor.user.is_superuser:
+                        hackathon_competitors.append(competitor)
 
     # Loads and displays all competitors within hackathon circle
     competitors = {}
     for competitor in hackathon_competitors:
         parameters = {}
+        if competitor.team_id:
+            team = models.Team.objects.get(id=competitor.team_id)
+            parameters["team"] = team
+        else:
+            parameters["team"] = None
+
         if request.user.profile.team_id:
             if request.user.profile.team_id == competitor.team_id:
                 parameters["invite"] = False
@@ -305,6 +314,10 @@ def create_team(request):
         user = models.UserProfile.objects.get(user=request.user)
         user.team_id = team.id
         user.save()
+
+        # Creating team identification
+        tid = models.TeamIdentification(team_id=team.id, user_id=user.id)
+        tid.save()
 
         # Getting current hackathon from subdomain
         hackathon_name = request.get_host().split(".")[0]
@@ -360,12 +373,9 @@ def notifications(request):
             notification = models.Notification.objects.get(id=hid.model_id)
             hackathon_notifications.append(notification)
 
-    print(hackathon_notifications)
-    print(type(request.user.profile.id))
     notifications = {}
     # Grabbing teams for each action notification
     for notification in hackathon_notifications:
-        print(notification.source_id)
         if notification.target_id == str(request.user.profile.id):
             if notification.type == "action" and notification.source_id:
                 team = models.Team.objects.get(id=notification.source_id)
@@ -407,6 +417,22 @@ def view_profile(request, user_id):
 def view_team(request, team_id):
     team = models.Team.objects.get(id=team_id)
 
+    # Loading all members
+    teammates = []
+    for tid in models.TeamIdentification.objects.filter(team_id=team_id):
+        profile = models.UserProfile.objects.get(id=tid.user_id)
+        teammates.append(profile)
+
+    return render(request, "hackathon/view_team.html", context={
+        "team": team,
+        "teammates": teammates,
+        "leader": models.UserProfile.objects.get(id=team.leader),
+    })
+
+@login_required(login_url="/login/")
+def team(request, team_id):
+    team = models.Team.objects.get(id=team_id)
+
     if request.user.profile.team_id == team.id:
         team = models.Team.objects.get(id=team_id)
 
@@ -437,7 +463,8 @@ def view_team(request, team_id):
             "team": team,
             "leader": models.UserProfile.objects.get(id=team.leader),
             "teammates": teammates,
-            "notifications": notifications
+            "notifications": notifications,
+            "submitted": models.TeamSubmission.objects.filter(hackathon_name=hackathon_name, team_id=team_id).exists(),
         })
     else:
         # Return error if user is not part of the team
@@ -472,6 +499,9 @@ def kickout(request):
     # Creating hackathon identification
     hid = models.HackathonIdentification(hackathon_name=hackathon.name, model_id=notification.id)
     hid.save()
+
+    # Delete team identification
+    models.TeamIdentification.objects.get(team_id=request.user.profile.team_id, user_id=member.id).delete()
 
     # Kicking them out
     member.team_id = None
@@ -515,13 +545,24 @@ def join_team(request, team_id):
 def leave_team(request, team_id):
     # Getting current user and setting team_id to null
     profile = models.UserProfile.objects.get(user=request.user)
+    id = profile.id
     profile.team_id = None
     profile.save()
+
+    # Delete team identification
+    models.TeamIdentification.objects.get(team_id=team_id, user_id=id).delete()
 
     # Removing team if no one else is in it
     if not models.UserProfile.objects.filter(team_id=team_id):
         models.Team.objects.get(id=team_id).delete()
         models.HackathonIdentification.objects.get(model_id=team_id).delete()
+
+    else:
+        # Assign random member as leader
+        random_id = models.TeamIdentification.objects.filter(team_id=team_id)[0]
+        team = models.Team.objects.get(id=team_id)
+        team.leader = random_id.user_id
+        team.save()
 
     # Sending email to whole team
     for temp_profile in models.UserProfile.objects.filter(team_id=team_id):
@@ -556,7 +597,6 @@ def invite_to_team(request):
         # Sending email to user
         profile = models.UserProfile.objects.get(id=target_id)
         email = profile.user.email
-        print(email)
         email_message = EmailMessage("Team invitation received", "You have been requested to join a team. Please view your notifications page to accept or reject it.", to=[email])
         email_message.send()
 
@@ -566,6 +606,220 @@ def invite_to_team(request):
 
     return render(request, "hackathon/invite_to_team.html")
 
+def hackathon_info(request):
+    html_file = open(os.path.dirname(__file__) + "/info_files/" + request.get_host().split('.')[0] + "_info.txt", "r")
+    html = html_file.read()
+
+    return render(request, "hackathon/hackathon_info.html", context={"html": mark_safe(html)})
+
+def submit(request):
+    if request.method == "POST":
+        # Getting submission information
+        hackathon_name = request.get_host().split(".")[0]
+        team_id = request.user.profile.team_id
+        submission_name = request.POST.get("submission_name")
+        submission_description = request.POST.get("submission_description")
+
+        # Creating submission
+        submission = models.TeamSubmission(hackathon_name=hackathon_name, team_id=team_id, submission_name=submission_name, submission_description=submission_description)
+        submission.save()
+
+        return HttpResponseRedirect("/")
+
+    return render(request, "hackathon/submit.html")
+
+def submissions(request):
+    # Getting hackathon from subdomain
+    hackathon_name = request.get_host().split(".")[0]
+
+    # Loading and displaying all team submissions
+    submissions = []
+    counter = 1
+    parameters = []
+    for submission in models.TeamSubmission.objects.filter(hackathon_name=hackathon_name):
+        parameters = []
+
+        # Appending number
+        parameters.append(counter)
+        counter += 1
+
+        # Appending team
+        team = models.Team.objects.get(id=submission.team_id)
+        parameters.append(team)
+
+        # Appending submission
+        parameters.append(submission)
+
+    if parameters:
+        submissions.append(parameters)
+
+    return render(request, "hackathon/submissions.html", context={"submissions": submissions})
+
+def awards(request):
+    # Getting hackathon from subdomain
+    hackathon_name = request.get_host().split(".")[0]
+
+    # Loading and displaying all awards
+    awards = {}
+    for award in models.Award.objects.filter(hackathon_name=hackathon_name):
+        if award.team_id:
+            team = models.Team.objects.get(id=award.team_id)
+            awards[award] = team
+        else:
+            awards[award] = None
+
+    return render(request, "hackathon/awards.html", context={"awards": awards})
+
+# STAFF VIEWS
+@staff_member_required
+@login_required(login_url="/login/")
+def modify_hackathon_info(request):
+    if request.method == "POST":
+        new_info = request.POST.get("hackathon_info")
+
+        html = markdown2.markdown(new_info)
+        html_file = open(os.path.dirname(__file__) + "/info_files/" + request.get_host().split('.')[0] + "_info.txt", "w")
+        html_file.write(html)
+
+        return HttpResponseRedirect("/hackathon-info/")
+
+    html_file = open(os.path.dirname(__file__) + "/info_files/" + request.get_host().split('.')[0] + "_info.txt", "r")
+    markdown = html2markdown.convert(html_file.read())
+
+    return render(request, "hackathon/modify_hackathon_info.html", context={"markdown": markdown})
+
+
+@staff_member_required
+@login_required(login_url="/login/")
+def admin_view(request):
+    # Getting current hackathon from subdomain
+    hackathon_name = request.get_host().split(".")[0]
+
+    if request.method == "POST":
+        submit_type = request.POST.get("type")
+        if submit_type == "update":
+            id = request.POST.get("id")
+            title = request.POST.get("title")
+            description = request.POST.get("description")
+            prize = request.POST.get("prize")
+
+            # Updating model
+            award = models.Award.objects.get(id=id)
+            award.title = title
+            award.description = description
+            award.prize = prize
+            award.save()
+
+        elif submit_type == "add":
+            title = request.POST.get("title")
+            description = request.POST.get("description")
+            prize = request.POST.get("prize")
+
+            # Creating and storing award
+            award = models.Award(hackathon_name=hackathon_name, title=title, description=description, prize=prize)
+            award.save()
+
+    # Get all models within hackathon
+    hids = models.HackathonIdentification.objects.filter(hackathon_name=hackathon_name)
+    hackathon_teams = []
+    hackathon_competitors = []
+    for hid in hids:
+        # Getting all teams
+        if hid.model_id.startswith("t"):
+            team = models.Team.objects.get(id=hid.model_id)
+            hackathon_teams.append(team)
+        # Getting all competitors
+        if not hid.model_id.startswith("t") and not hid.model_id.startswith("n"):
+            competitor = models.UserProfile.objects.get(id=hid.model_id)
+            if competitor != request.user.profile:
+                if not competitor.user.is_staff:
+                    if not competitor.user.is_superuser:
+                        hackathon_competitors.append(competitor)
+
+    # Loading and displaying all teams
+    teams = {}
+
+    for team in hackathon_teams:
+        id = team.id
+        teammates = []
+        for user in models.UserProfile.objects.all():
+            if user.team_id == id:
+                teammates.append(user)
+
+        teams[team] = teammates
+
+    # Loading and displaying all team submissions
+    submissions = []
+    counter = 1
+    parameters = []
+    for submission in models.TeamSubmission.objects.filter(hackathon_name=hackathon_name):
+        parameters = []
+
+        # Appending number
+        parameters.append(counter)
+        counter += 1
+
+        # Appending team
+        for hid in models.HackathonIdentification.objects.filter(hackathon_name=hackathon_name):
+            # Getting all teams
+            if hid.model_id.startswith("t"):
+                team = models.Team.objects.get(id=hid.model_id)
+                parameters.append(team)
+                break
+
+        # Appending submission
+        parameters.append(submission)
+
+    if parameters:
+        submissions.append(parameters)
+
+    # Loading and displaying all awards
+    awards = {}
+    for award in models.Award.objects.filter(hackathon_name=hackathon_name):
+        if award.team_id:
+            team = models.Team.objects.get(id=award.team_id)
+            awards[award] = team
+        else:
+            awards[award] = None
+
+    return render(request, "hackathon/admin_view.html", context={
+        "teams": teams,
+        "competitors": hackathon_competitors,
+        "submissions": submissions,
+        "awards": awards,
+    })
+
+def select_team(request):
+    # Getting current hackathon from subdomain
+    hackathon_name = request.get_host().split(".")[0]
+
+    # Getting award ID
+    award_id = request.GET.get("award_id")
+
+    # Get all models within hackathon
+    hids = models.HackathonIdentification.objects.filter(hackathon_name=hackathon_name)
+    hackathon_teams = []
+    for hid in hids:
+        if hid.model_id.startswith("t"):
+            team = models.Team.objects.get(id=hid.model_id)
+            hackathon_teams.append(team)
+
+    # Loading and displaying all teams
+    teams = {}
+
+    for team in hackathon_teams:
+        id = team.id
+        teammates = []
+        for user in models.UserProfile.objects.all():
+            if user.team_id == id:
+                teammates.append(user)
+
+        teams[team] = teammates
+
+    return render(request, "hackathon/select_team.html", context={"teams": teams, "award_id": award_id})
+
+
+# POST REQUEST VIEWS
 @login_required(login_url="/login/")
 def accept_user(request):
     # Grabbing query parameters
@@ -601,11 +855,14 @@ def accept_user(request):
     profile.team_id = team_id
     profile.save()
 
+    # Creating team identification
+    tid = models.TeamIdentification(team_id=team_id, user_id=profile.id)
+    tid.save()
+
     messages.success(request, "User successfully accepted into team!")
 
     return HttpResponseRedirect("/")
 
-@login_required(login_url="/login/")
 def reject_user(request):
     # Grabbing query parameters
     notification_id = request.GET.get("notification_id")
@@ -640,7 +897,6 @@ def reject_user(request):
 
     return HttpResponseRedirect("/")
 
-@login_required(login_url="/login/")
 def accept_invite(request):
     # Grabbing query parameters
     notification_id = request.GET.get("notification_id")
@@ -651,6 +907,10 @@ def accept_invite(request):
     profile = models.UserProfile.objects.get(id=user_id)
     profile.team_id = team_id
     profile.save()
+
+    # Creating team identification
+    tid = models.TeamIdentification(team_id=team_id, user_id=profile.id)
+    tid.save()
 
     # Deleting notification
     notification = models.Notification.objects.get(id=notification_id)
@@ -713,67 +973,6 @@ def reject_invite(request):
 
     return HttpResponseRedirect("/")
 
-def hackathon_info(request):
-    html_file = open(os.path.dirname(__file__) + "/info_files/" + request.get_host().split('.')[0] + "_info.txt", "r")
-    html = html_file.read()
-
-    return render(request, "hackathon/hackathon_info.html", context={"html": mark_safe(html)})
-
-# Staff Views
-@staff_member_required
-@login_required(login_url="/login/")
-def modify_hackathon_info(request):
-    if request.method == "POST":
-        new_info = request.POST.get("hackathon_info")
-
-        html = markdown2.markdown(new_info)
-        html_file = open(os.path.dirname(__file__) + "/info_files/" + request.get_host().split('.')[0] + "_info.txt", "w")
-        html_file.write(html)
-
-        return HttpResponseRedirect("/hackathon-info/")
-
-    html_file = open(os.path.dirname(__file__) + "/info_files/" + request.get_host().split('.')[0] + "_info.txt", "r")
-    markdown = html2markdown.convert(html_file.read())
-
-    return render(request, "hackathon/modify_hackathon_info.html", context={"markdown": markdown})
-
-
-@staff_member_required
-@login_required(login_url="/login/")
-def admin_view(request):
-    # Getting current hackathon from subdomain
-    hackathon_name = request.get_host().split(".")[0]
-
-    # Get all models within hackathon
-    hids = models.HackathonIdentification.objects.filter(hackathon_name=hackathon_name)
-    hackathon_teams = []
-    hackathon_competitors = []
-    for hid in hids:
-        # Getting all teams
-        if hid.model_id.startswith("t"):
-            team = models.Team.objects.get(id=hid.model_id)
-            hackathon_teams.append(team)
-        # Getting all competitors
-        if not hid.model_id.startswith("t") and not hid.model_id.startswith("n"):
-            competitor = models.UserProfile.objects.get(id=hid.model_id)
-            hackathon_competitors.append(competitor)
-
-    # Loading and displaying all teams
-    teams = {}
-
-    for team in hackathon_teams:
-        id = team.id
-        teammates = []
-        for user in models.UserProfile.objects.all():
-            if user.team_id == id:
-                teammates.append(user)
-
-        teams[team] = teammates
-
-    return render(request, "hackathon/admin_view.html", context={"teams": teams, "competitors": hackathon_competitors})
-
-
-# POST REQUEST
 def delete_user(request):
     # Getting current hackathon from subdomain
     hackathon_name = request.get_host().split(".")[0]
@@ -781,7 +980,11 @@ def delete_user(request):
     id = request.GET.get("id")
 
     profile = models.UserProfile.objects.get(id=id)
+    profile.user.delete()
     models.HackathonIdentification.objects.get(hackathon_name=hackathon_name, model_id=id).delete()
+
+    # Deleting team identification
+    models.TeamIdentification.objects.get(user_id=profile.id).delete()
 
     EmailMessage("HackCollab Account Deleted", "You're HackCollab account has been deleted. Please contact the administrators for more information or re-register.", to=[profile.user.email]).send()
 
@@ -807,6 +1010,9 @@ def delete_team(request):
 
     # Removing team from all users
     for profile in models.UserProfile.objects.filter(team_id=id):
+        # Delete team identification
+        models.TeamIdentification.objects.get(team_id=id, user_id=profile.id).delete()
+
         profile.team_id = None
         profile.save()
 
@@ -832,3 +1038,31 @@ def delete_notification(request):
     models.HackathonIdentification.objects.get(model_id=id).delete()
 
     return JsonResponse({"value": "hi"})
+
+def delete_submission(request):
+    id = request.GET.get("id")
+
+    models.TeamSubmission.objects.get(team_id=id).delete()
+
+    return HttpResponseRedirect("/")
+
+def delete_award(request):
+    id = request.GET.get("id")
+
+    models.Award.objects.get(id=id).delete()
+
+    return HttpResponseRedirect("/admin-view/")
+
+def assign_award(request):
+    award_id = request.GET.get("award_id")
+    team_id = request.GET.get("team_id")
+
+    award = models.Award.objects.get(id=award_id)
+
+    if team_id == "None":
+        award.team_id = None
+    else:
+        award.team_id = team_id
+    award.save()
+
+    return HttpResponseRedirect("/admin-view/")

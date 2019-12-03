@@ -8,30 +8,29 @@
       {% if competitors %}
         <div class="competitors">
           {% for competitor, parameters in competitors.items %}
-            {% if competitor != request.user.profile %}
-              {% if not competitor.user.is_staff %}
-                {% if not competitor.user.is_superuser %}
-                  <div class="competitor">
-                    <div class="image-cropper">
-                      <img class="profile-picture" src="/media/{{competitor.profile_picture}}" alt="">
-                    </div>
-                    <a href="/profile/{{competitor.id}}"><h4>{{competitor.user.username}}</h4></a>
-                    <p style="margin-bottom: 0 !important;">{{competitor.title}}</p>
-                    {% if request.user.profile.team_id %}
-                      {% if parameters.invite %}
-                        {% if parameters.max %}
-                          <small>Max amount of team members reached!</small>
-                        {% else %}
-                          <a class="btn btn-primary" href="/invite-to-team?team_id={{request.user.profile.team_id}}&user_id={{competitor.id}}">Invite to team</a>
-                        {% endif %}
-                      {% else %}
-                        <small>{{competitor.user.username}} is already on your team</small>
-                      {% endif %}
-                    {% endif %}
-                  </div>
+            <div class="competitor">
+              <div class="image-cropper">
+                <img class="profile-picture" src="/media/{{competitor.profile_picture}}" alt="">
+              </div>
+              <a href="/profile/{{competitor.id}}"><h4>{{competitor.user.username}}</h4></a>
+              <p style="margin-bottom: 0 !important;"><strong>Title:</strong> {{competitor.title}}</p>
+              {% if parameters.team %}
+                <div>
+                  <strong>Team:</strong> <a href="/view-team/{{parameters.team.id}}">{{parameters.team.name}}</a>
+                </div>
+              {% endif %}
+              {% if request.user.profile.team_id %}
+                {% if parameters.invite %}
+                  {% if parameters.max %}
+                    <small>Max amount of team members reached!</small>
+                  {% else %}
+                    <a class="btn btn-primary" href="/invite-to-team?team_id={{request.user.profile.team_id}}&user_id={{competitor.id}}">Invite to team</a>
+                  {% endif %}
+                {% else %}
+                  <small>{{competitor.user.username}} is already on your team</small>
                 {% endif %}
               {% endif %}
-            {% endif %}
+            </div>
           {% endfor %}
         </div>
       {% else %}

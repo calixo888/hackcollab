@@ -1,7 +1,7 @@
 {% load staticfiles %}
 {% include 'hackathon/base.html' %}
 <title>HackCollab - Teams</title>
-<link rel="stylesheet" href="{% static 'hackathon/teams.css' %}">
+<link rel="stylesheet" href="{% static 'hackathon/select-team.css' %}">
 {% block body %}
     <h1 class="header">Teams</h1>
     <div class="container">
@@ -22,9 +22,8 @@
                   </li>
                 {% endfor %}
               </ul>
-              <div class="blur-in">
-                <a class="btn btn-outline-light" href="/view-team/{{team.id}}">View Team</a>
-                <a class="btn btn-outline-light" href="/join-team/{{team.id}}">Join this Team</a>
+              <div>
+                <a href="/assign-award?award_id={{award_id}}&team_id={{team.id}}" class="btn btn-primary">Select</a>
               </div>
             </div>
           {% endfor %}

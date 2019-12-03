@@ -3,96 +3,103 @@
 <title>HackCollab - My Team</title>
 <link rel="stylesheet" href="{% static 'hackathon/team.css' %}">
 {% block body %}
-    <div class="float-container">
-      <h1>My Team</h1>
-      <div class="team-interface">
-        <div class="left">
-          <h3 class="text-center">Team Info</h3>
-          <p>
-            <strong>Team Name:</strong> {{team.name}}
-          </p>
-          <p>
-            <strong>Team Description:</strong> {{team.description}}
-          </p>
+    <div class="container mt-5">
+      <div class="float-container">
+        <h1>My Team</h1>
+        <div class="team-interface">
+          <div class="left">
+            <h3 class="text-center">Team Info</h3>
+            <p>
+              <strong>Team Name:</strong> {{team.name}}
+            </p>
+            <p>
+              <strong>Team Description:</strong> {{team.description}}
+            </p>
 
-          <p>
-            <strong>Leader:</strong> <a style="color: black;" href="/profile/{{leader.user.profile.id}}">{{leader.user.username}}</a>
-          </p>
+            <p>
+              <strong>Leader:</strong> <a style="color: black;" href="/profile/{{leader.user.profile.id}}">{{leader.user.username}}</a>
+            </p>
 
-          <strong>Team Members</strong>
-          <ul class="fa-ul">
-            {% for teammate in teammates %}
-              <li>
-                <span class="fa-li"><i class="fas fa-angle-right"></i></span>
-                <a style="color: black;" href="/profile/{{teammate.id}}">{{teammate.user.username}}</a>
-                {% if teammate != request.user.profile %}
-                  {% if request.user.profile == leader %}
-                    <a class="btn btn-danger btn-sm" href="/kickout?member_id={{teammate.id}}">Kickout</a>
+            <strong>Team Members</strong>
+            <ul class="fa-ul">
+              {% for teammate in teammates %}
+                <li>
+                  <span class="fa-li"><i class="fas fa-angle-right"></i></span>
+                  <a style="color: black;" href="/profile/{{teammate.id}}">{{teammate.user.username}}</a>
+                  {% if teammate != request.user.profile %}
+                    {% if request.user.profile == leader %}
+                      <a class="btn btn-danger btn-sm" href="/kickout?member_id={{teammate.id}}">Kickout</a>
+                    {% endif %}
                   {% endif %}
-                {% endif %}
-              </li>
-            {% endfor %}
-          </ul>
-          <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal">
-            Leave Team
-          </button>
-        </div>
-
-        <div class="right">
-          <h3 class="text-center">Team Notifications</h3>
-          {% if notifications %}
-            {% if request.user.profile == leader %}
-              <div class="list-group">
-                {% for notification, profile in notifications.items %}
-                  <div class="list-group-item">
-                    <h5>{{notification.title}}</h5>
-                    <p>{{notification.description}}</p>
-                    {% if profile %}
-                      <p>
-                        <strong>From:</strong> <a href="/profile/{{profile.id}}">{{profile.user.username}}</a>
-                      </p>
-                    {% endif %}
-                    {% if notification.type == "action" %}
-                      <div class="btn-group">
-                        <a class="btn btn-primary" href="/accept-user?notification_id={{notification.id}}&user_id={{profile.id}}&team_id={{team.id}}">Accept</a>
-                        <a class="btn btn-primary" href="/reject-user?notification_id={{notification.id}}&team_id={{notification.target_id}}&user_id={{profile.id}}">Reject</a>
-                      </div>
-                      {% else %}
-                        <button class="x" type="button" onclick="deleteNotification('{{notification.id}}')">&times;</button>
-                    {% endif %}
-                  </div>
-                {% endfor %}
-              </div>
+                </li>
+              {% endfor %}
+            </ul>
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal">
+              Leave Team
+            </button>
+            {% if not submitted %}
+              <a href="/submit/" class="btn btn-primary">Submit Project</a>
             {% else %}
-              <div class="text-center">
-                <small>Only team leaders can edit notifications.</small>
-              </div>
-              <div class="list-group" style="position: relative;">
-                <div class="disable-overlay"></div>
-                {% for notification, profile in notifications.items %}
-                  <div class="list-group-item" style="pointer-events: none;">
-                    <h5>{{notification.title}}</h5>
-                    <p>{{notification.description}}</p>
-                    {% if profile %}
-                      <p>
-                        <strong>From:</strong> <a href="/profile/{{profile.id}}">{{profile.user.username}}</a>
-                      </p>
-                    {% endif %}
-                    {% if notification.type == "action" %}
-                      <div class="btn-group">
-                        <a class="btn btn-primary" href="/accept-user?notification_id={{notification.id}}&user_id={{profile.id}}&team_id={{team.id}}">Accept</a>
-                        <a class="btn btn-primary" href="/reject-user?notification_id={{notification.id}}&team_id={{notification.target_id}}&user_id={{profile.id}}">Reject</a>
-                      </div>
-                      {% else %}
-                        <button class="x" type="button" onclick="deleteNotification('{{notification.id}}')">&times;</button>
-                    {% endif %}
-                  </div>
-                {% endfor %}
-              </div>
+              <small>Your team has already submitted a project!</small>
             {% endif %}
-          {% else %}
-            <small class="d-block text-center">No notifications!</small>
-          {% endif %}
+          </div>
+
+          <div class="right">
+            <h3 class="text-center">Team Notifications</h3>
+            {% if notifications %}
+              {% if request.user.profile == leader %}
+                <div class="list-group">
+                  {% for notification, profile in notifications.items %}
+                    <div class="list-group-item">
+                      <h5>{{notification.title}}</h5>
+                      <p>{{notification.description}}</p>
+                      {% if profile %}
+                        <p>
+                          <strong>From:</strong> <a href="/profile/{{profile.id}}">{{profile.user.username}}</a>
+                        </p>
+                      {% endif %}
+                      {% if notification.type == "action" %}
+                        <div class="btn-group">
+                          <a class="btn btn-primary" href="/accept-user?notification_id={{notification.id}}&user_id={{profile.id}}&team_id={{team.id}}">Accept</a>
+                          <a class="btn btn-primary" href="/reject-user?notification_id={{notification.id}}&team_id={{notification.target_id}}&user_id={{profile.id}}">Reject</a>
+                        </div>
+                        {% else %}
+                          <button class="x" type="button" onclick="deleteNotification('{{notification.id}}')">&times;</button>
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <div class="text-center">
+                  <small>Only team leaders can edit notifications.</small>
+                </div>
+                <div class="list-group" style="position: relative;">
+                  <div class="disable-overlay"></div>
+                  {% for notification, profile in notifications.items %}
+                    <div class="list-group-item" style="pointer-events: none;">
+                      <h5>{{notification.title}}</h5>
+                      <p>{{notification.description}}</p>
+                      {% if profile %}
+                        <p>
+                          <strong>From:</strong> <a href="/profile/{{profile.id}}">{{profile.user.username}}</a>
+                        </p>
+                      {% endif %}
+                      {% if notification.type == "action" %}
+                        <div class="btn-group">
+                          <a class="btn btn-primary" href="/accept-user?notification_id={{notification.id}}&user_id={{profile.id}}&team_id={{team.id}}">Accept</a>
+                          <a class="btn btn-primary" href="/reject-user?notification_id={{notification.id}}&team_id={{notification.target_id}}&user_id={{profile.id}}">Reject</a>
+                        </div>
+                        {% else %}
+                          <button class="x" type="button" onclick="deleteNotification('{{notification.id}}')">&times;</button>
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% else %}
+              <small class="d-block text-center">No notifications!</small>
+            {% endif %}
+          </div>
         </div>
       </div>
     </div>

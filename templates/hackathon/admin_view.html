@@ -2,6 +2,9 @@
 {% include 'hackathon/base.html' %}
 <link rel="stylesheet" href="{% static 'hackathon/teams.css' %}">
 <link rel="stylesheet" href="{% static 'hackathon/competitors.css' %}">
+<link rel="stylesheet" href="{% static 'hackathon/awards.css' %}">
+<link rel="stylesheet" href="{% static 'hackathon/admin_view.css' %}">
+<title>HackCollab - Administrator View</title>
 {% block body %}
   <style>
     /* Removing darken hover effect */
@@ -16,26 +19,18 @@
       {% if competitors %}
         <div class="competitors">
           {% for competitor in competitors %}
-            {% if competitor != request.user.profile %}
-              {% if not competitor.user.is_staff %}
-                {% if not competitor.user.is_superuser %}
-                  <div class="competitor">
-                    <div class="image-cropper">
-                      <img class="profile-picture" src="/media/{{competitor.profile_picture}}" alt="">
-                    </div>
-                    <a href="/profile/{{competitor.id}}"><h4>{{competitor.user.username}}</h4></a>
-                    <p style="margin-bottom: 0 !important;">{{competitor.title}}</p>
-                    <a href="/delete-user?id={{competitor.id}}" class="btn btn-outline-primary mt-3">Delete User</a>
-                  </div>
-                {% endif %}
-              {% endif %}
-            {% endif %}
+            <div class="competitor">
+              <div class="image-cropper">
+                <img class="profile-picture" src="/media/{{competitor.profile_picture}}" alt="">
+              </div>
+              <a href="/profile/{{competitor.id}}"><h4>{{competitor.user.username}}</h4></a>
+              <p style="margin-bottom: 0 !important;">{{competitor.title}}</p>
+              <a href="/delete-user?id={{competitor.id}}" class="btn btn-outline-primary mt-3">Delete User</a>
+            </div>
           {% endfor %}
         </div>
       {% else %}
-        <div class="text-center">
-          <small style="color: white;">No competitors yet!</small>
-        </div>
+        <small style="color: white;">No competitors yet!</small>
       {% endif %}
     </div>
     <h1 class="subheader">Teams</h1>
@@ -62,10 +57,128 @@
           {% endfor %}
         </div>
       {% else %}
-        <div class="text-center">
-          <small style="color: white;">No teams yet!</small>
-        </div>
+        <small>No teams yet!</small>
       {% endif %}
     </div>
+    <h1 class="subheader">Team Submissions</h1>
+    <div class="container">
+      {% if submissions %}
+        <ul class="list-group">
+          <p class="submission-item" style="color: white;">
+            <span>Counter</span>
+            <span>Team</span>
+            <span>Submission Name</span>
+            <span>Submission Description</span>
+            <span>Delete</span>
+          </p>
+          {% for number, team, submission in submissions %}
+            <li class="list-group-item submission-item">
+              <span>{{number}}.</span>
+              <a href="/team/{{team.id}}">{{team.name}}</a>
+              <span>{{submission.submission_name}}</span>
+              <span>{{submission.submission_description}}</span>
+              <a href="/delete-submission?id={{team.id}}" class="btn btn-danger btn-inline">Delete</a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <small style="color: white;">No submissions yet!</small>
+      {% endif %}
+    </div>
+    <h1 class="subheader" style="position: relative;">
+      Awards
+      <button style="position: absolute !important; right: 0;" class="btn btn-outline-light" data-toggle="modal" data-target="#addAward">Add Award</button>
+    </h1>
+    <div class="container">
+      <div class="awards-grid">
+        {% if awards %}
+          {% for award, team in awards.items %}
+            <div class="award">
+              <h3>{{award.title}}</h3>
+              <p>
+                <strong>Description:</strong> {{award.description}}
+              </p>
+              <p>
+                <strong>Prize:</strong> {{award.prize}}
+              </p>
+              {% if not team %}
+                <small><strong>Winner not announced yet!</strong></small>
+              {% else %}
+                <strong>Winner:</strong> <a href="/view-team/{{team.id}}">{{team.name}}</a> <a href="/assign-award?award_id={{award.id}}&team_id=None" class="btn btn-danger btn-sm">Remove</a>
+              {% endif %}
+              <div class="mt-3">
+                <a href="/select-team?award_id={{award.id}}" class="btn btn-success">Select Winner</a>
+                <a href="#" data-toggle="modal" data-target="#exampleModal" class="btn btn-secondary">Update</a>
+                <a href="/delete-award?id={{award.id}}" class="btn btn-danger">Delete</a>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <small style="color: white;">No awards yet!</small>
+        {% endif %}
+      </div>
+    </div>
   </div>
+
+  <!-- MODALS -->
+  {% for award, team in awards.items %}
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Update Award</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="updateForm{{award.id}}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="type" value="update">
+              <input type="hidden" name="id" value="{{award.id}}">
+              <input class="form-control" type="text" name="title" placeholder="Title" value="{{award.title}}">
+              <textarea class="my-3 form-control" name="description" rows="6" placeholder="Description">{{award.description}}</textarea>
+              <input type="text" name="prize" placeholder="Prize" class="form-control" value="{{award.prize}}">
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="submitForm('#updateForm{{award.id}}')">Update Award</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+
+  <div class="modal fade" id="addAward" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add Award</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="addForm" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="type" value="add">
+            <input class="form-control" type="text" name="title" placeholder="Title">
+            <textarea class="my-3 form-control" name="description" rows="6" placeholder="Description"></textarea>
+            <input type="text" name="prize" placeholder="Prize" class="form-control">
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="submitForm('#addForm')">Add Award</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function submitForm(form_id) {
+      document.querySelector(form_id).submit()
+    }
+  </script>
 {% endblock %}

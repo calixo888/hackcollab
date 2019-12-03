@@ -1,0 +1,40 @@
+{% include 'hackathon/base.html' %}
+{% block body %}
+  <style>
+    .profile-container {
+      display: inline-block;
+      background-color: white;
+      padding: 50px;
+      border-radius: 5px;
+      box-shadow: 0 5px 10px rgba(0,0,0,.3);
+      margin-bottom: 50px;
+      text-align: left;
+    }
+  </style>
+  <h1 class="header">View Team</h1>
+  <div class="text-center">
+    <div class="profile-container">
+      <h1>Team {{team.name}}</h1>
+      <p>
+        <strong>Team Name:</strong> {{team.name}}
+      </p>
+      <p>
+        <strong>Team Description:</strong> {{team.description}}
+      </p>
+
+      <p>
+        <strong>Leader:</strong> <a style="color: black;" href="/profile/{{leader.user.profile.id}}">{{leader.user.username}}</a>
+      </p>
+
+      <strong>Team Members</strong>
+      <ul class="fa-ul">
+        {% for teammate in teammates %}
+          <li>
+            <span class="fa-li"><i class="fas fa-angle-right"></i></span>
+            <a style="color: black;" href="/profile/{{teammate.id}}">{{teammate.user.username}}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+{% endblock %}

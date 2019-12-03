@@ -19,8 +19,6 @@ from django.conf.urls import url
 from django.conf.urls.static import static
 from django.conf import settings
 from django.views.static import serve
-# from hackcollab_app import views as hackcollab_app_views
-# from django.conf.urls import handler404, handler500
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,9 +26,6 @@ urlpatterns = [
     url(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}),
     url(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-# handler404 = hackcollab_app_views.handler404
-# handler500 = hackcollab_app_views.handler500
 
 handler404 = 'hackcollab_app.views.handler404'
 handler500 = 'hackcollab_app.views.handler500'
