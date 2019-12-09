@@ -41,13 +41,10 @@
       </button>
       <div class="collapse navbar-collapse" id="navbar-target">
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="/hackathon-info/">Hackathon Info</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/contact-support/">Contact Support</a>
-            </li>
             {% if request.user.is_authenticated %}
+              <li class="nav-item">
+                  <a class="nav-link" href="/contact-support/">Contact Support</a>
+              </li>
               {% if request.user.is_staff %}
                 <li class="nav-item">
                     <a class="nav-link" href="/admin-view/">Admin. View</a>
@@ -63,27 +60,31 @@
                 </li>
               {% endif %}
               <li class="nav-item">
-                  <a class="nav-link" href="/teams/">Teams</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="/competitors/">Competitors</a>
-              </li>
-              <li class="nav-item">
                   <a class="nav-link" href="/profile/{{request.user.profile.id}}">View Profile</a>
               </li>
               <li class="nav-item">
                   <a class="nav-link" href="/notifications/">Notifications</a>
               </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="/team-submissions/">Submissions</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="/awards/">Awards</a>
+              <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Hackathon Info</a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/hackathon-info/">Hackathon Info</a>
+                    <a class="dropdown-item" href="/teams/">Teams</a>
+                    <a class="dropdown-item" href="/competitors/">Competitors</a>
+                    <a class="dropdown-item" href="/team-submissions/">Submissions</a>
+                    <a class="dropdown-item" href="/awards/">Awards</a>
+                  </div>
               </li>
               <li class="nav-item">
                   <a class="nav-link" href="/logout/">Logout</a>
               </li>
             {% else %}
+              <li class="nav-item">
+                  <a class="nav-link" href="/hackathon-info/">Hackathon Info</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="/contact-support/">Contact Support</a>
+              </li>
               <li class="nav-item">
                   <a class="nav-link" href="/login/">Login/Register</a>
               </li>

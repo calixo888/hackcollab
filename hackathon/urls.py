@@ -9,6 +9,8 @@ from django.views.static import serve
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # Regular URLs
     url("^$", views.index, name="index"),
     url("^register/$", views.register, name="register"),
     url("^login/$", views.user_login, name="login"),
